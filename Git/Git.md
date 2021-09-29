@@ -1,6 +1,6 @@
 # Git
 
-> 분산버전관리시스템
+> 분산버전관리시스템, 코드의 버전을 관리하는 도구
 
 ## git 저장소 만들기
 
@@ -12,7 +12,7 @@ Initialized empty Git repository in C:/Users/student/Desktop/test/.git/
 ```
 
 * `.git` 폴더가 생성되며, 버전이 관리되는 저장소
-* git bash에서는 `(master)` 로 브랜치가 표기 된다.
+* git bash에서는 `(master)` 로 브랜치가 표기 된다. 
 
 ## 버전 만들기
 
@@ -174,7 +174,11 @@ $git push -u origin master
 
 
 
+## README.md
 
+오픈소스의 공식 문서를 작성하거나
+
+개인 프로젝트의 프로젝트 소개서로 활용
 
 
 
