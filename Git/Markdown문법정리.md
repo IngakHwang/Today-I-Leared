@@ -85,7 +85,7 @@ a = a+1;
 
 ​	이미지 끌어다 써도 댐
 
-![둘리_초능력맛좀](md-images/%EB%91%98%EB%A6%AC_%EC%B4%88%EB%8A%A5%EB%A0%A5%EB%A7%9B%EC%A2%80.JPG)
+![둘리_초능력맛좀](../md-images/%EB%91%98%EB%A6%AC_%EC%B4%88%EB%8A%A5%EB%A0%A5%EB%A7%9B%EC%A2%80.JPG)
 
 ## **Blockquotes(인용문) - 한줄정리 할때 사용**
 

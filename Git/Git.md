@@ -142,6 +142,42 @@ Date:   Wed Sep 29 15:17:30 2021 +0900
     third
 ```
 
+## 원격 저장소 관련 명령어
+
+### `git remote add origin "저장소 url"`
+
+> 원격저장소(Github) 등록
+
+```bash
+$ git remote add origin https://github.com/IngakHwang/first.git
+```
+
+origin은 변수명 이라고 생각⇒ 바꿀 수 있는데, 왠만하면 바꾸지 않는 것이 좋음
+
+### `git remote -v`
+
+> 원격저장소 주소 확인
+
+```bash
+$ git remote -v
+origin  https://github.com/IngakHwang/first.git (fetch)
+origin  https://github.com/IngakHwang/first.git (push)
+```
+
+### `git push origin master`
+
+> commit된 내용 Github으로 push
+
+```bash
+$git push -u origin master
+```
+
+
+
+
+
+
+
 
 
 

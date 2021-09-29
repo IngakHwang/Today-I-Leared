@@ -20,7 +20,7 @@
 
 ### 절차적 프로그래밍(PP : Procedure Programming)
 
-![Procedure Programming](C:/Users/USER/Desktop/TIL/md-images/Procedure%20Programming.png)
+![Procedure Programming](../md-images/Procedure%20Programming.png)
 
 데이터에 대한 순서를 파악하고 필요한 기능을 함수로 만들어 절차적으로 진행시키는 방법
 
@@ -42,7 +42,7 @@
 
 ### 객체지향 프로그래밍(OOP)
 
-![Object Oriented Programming](C:/Users/USER/Desktop/TIL/md-images/Object%20Oriented%20Programming.png)
+![Object Oriented Programming](../md-images/Object%20Oriented%20Programming.png)
 
 기능들을 묶어 하나의 객체로 만든다
 
