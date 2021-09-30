@@ -4,4 +4,7 @@
 
 ## 목차
 
-[git](https://github.com/IngakHwang/Today-I-Leared)
+[Git](./Git)
+
+[Java](./Java)
+
