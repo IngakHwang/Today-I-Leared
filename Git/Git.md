@@ -166,11 +166,177 @@ origin  https://github.com/IngakHwang/first.git (push)
 
 ### `git push origin master`
 
-> commit된 내용 Github으로 push
+> commit된 내용 Github으로 push 
 
 ```bash
-$git push -u origin master
+$git push -u origin master		#master = branch
 ```
+
+### `git pull origin master`  
+
+> Github 저장소 땡겨오기
+
+```bash
+$git pull -u origin master
+```
+
+### `git clone 'url'`
+
+> github에 주소에 있는 Repositories 가져오기
+
+`clone` 은 원격저장소 자체를 가져온다
+
+
+
+## 브랜치 관련 명령어
+
+### `git branch {branch name}` 
+
+> 브랜치 생성
+
+```bash
+$ git checkout 'newBranch'
+```
+
+### `git checkout {branch name}` 
+
+> 현재 브랜치에서 {branch name}으로 이동
+
+```bash
+~/Desktop/branch (feature/index)  #(feature/index => master 이동)
+$ git checkout master
+Switched to branch 'master'
+```
+
+### git checkout -b {branch name}
+
+> {branch name} 생성 및 이동
+
+```bash
+~/Desktop/branch (master)			#(feature/index 브랜치생성 후 이동)
+$ git checkout -b 'feature/index'
+Switched to a new branch 'feature/index'
+```
+
+### `git branch` 
+
+> branch 목록 조회
+
+```bash
+$ git branch
+* master
+```
+
+### `git branch -d {branch name}`
+
+> {branch name} 삭제
+
+```bash
+$ git branch -d feature/about
+Deleted branch feature/about (was a61ecd3).
+```
+
+### `git merge {branch name}`
+
+>  브랜치 병합 = merge 
+
+```bash
+$ git merge feature/index
+Updating 139169d..15e4ff5
+Fast-forward
+ index.html | 0
+ 1 files changed, 0 insertions(+), 0 deletions(-)
+ create mode 100644 index.html
+```
+
+### `git long --ineline --graph` 
+
+> 브랜치 가지 확인
+
+```bash
+$ git log --oneline --graph
+*   20e3e0e (HEAD -> master) Merge branch 'feature/ppt'
+|\
+| * 95d5731 (feature/ppt) Add ppt & Update README
+* | 80a8bfd  인각
+|/
+*   8db1722 README change
+|\
+| * a61ecd3 Update README ...
+* | 5c6d968 Update README
+|/
+*   5bcea52 Merge branch 'feature/style'
+|\
+| * 9d11cef complete index css
+* | 3891a94 Hotfix
+|/
+* 25601f7 Use VSC for commit
+* c574e0f branch README commit
+```
+
+## Undoing
+
+### `git restore --staged {파일이름}` 
+
+> add 취소
+
+```bash
+$ git status
+On branch master
+Changes to be committed:
+  (use "git restore --staged <file>..." to unstage)
+        modified:   README.md
+        modified:   a.txt
+```
+
+```bash
+$ git restore --staged a.txt
+$ git status
+On branch master
+Changes to be committed:
+  (use "git restore --staged <file>..." to unstage)
+        modified:   README.md
+
+Changes not staged for commit:
+  (use "git add <file>..." to update what will be committed)
+  (use "git restore <file>..." to discard changes in working directory)
+        modified:   a.txt
+```
+
+
+
+### `git restore {파일이름}` 
+
+> 작업 내용을 이전 버전 상태로 되돌리기
+>
+> ***해당 명령어 실행 후 다시 복원 불가능***
+
+```bash
+$ git status
+On branch master
+Changes not staged for commit:
+  (use "git add <file>..." to update what will be committed)
+  # 변경사항을 버리기 위해서는...
+  # WD 있는거..
+  (use "git restore <file>..." to discard changes in working directory)
+        modified:   a.txt
+
+no changes added to commit (use "git add" and/or "git commit -a")
+```
+
+```bash
+$ git restore a.txt
+```
+
+
+
+### `git commit --amend` 
+
+> 커밋 메시지 수정
+>
+> 공개된 저장소에 push 된 커밋 메시지 수정하면 큰 일남
+>
+> => 커밋 해시값이 변경됨 (기존 버전을 건든다)
 
 
 
