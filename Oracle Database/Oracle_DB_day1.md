@@ -2,7 +2,9 @@
 
 ## 데이터베이스(Database, DB)
 
-> 데이터의 집합
+> **데이터의 집합**
+
+
 
 ### 특징
 
@@ -20,7 +22,9 @@
 
 ## DBMS(DateBase Management System)
 
-> DB를 잘 관리하고 운영하기 위한 소프트웨어
+> **DB를 잘 관리하고 운영하기 위한 소프트웨어**
+
+
 
 DBMS 데이터 구축, 관리, 활용하는 언어 => SQL
 
@@ -45,11 +49,13 @@ DBMS 데이터 구축, 관리, 활용하는 언어 => SQL
 
 ## SQL(Structured Query Language)
 
-> DB에서 데이터를 정의, 조작, 제어하기 위해 사용하는 언어
+> **DB에서 데이터를 정의, 조작, 제어하기 위해 사용하는 언어**
+
+
 
 ### 명령어
 
-`CREATE {DATEBASE or TABLE} {이름};` => DB or table 생성
+**`CREATE {DATEBASE or TABLE} {이름};` => DB or table 생성**
 
 ```sql
 CREATE DATABASE exDB;
@@ -57,21 +63,28 @@ CREATE DATABASE exDB;
 
 --table은 필드명, 데이터 유형기재해서 선언해야 함
 CREATE TABLE exTable(
-	userName NCHAR(3)  NOT NULL,
-	birthYear NUMBER(4) NOT NULL,
-	addr NCHAR(2) NOT NULL,
-	mobile VARCHAR2(12) NULL
+	id NUMBER(4),
+	userName NCHAR(3),
+	age NUMBER(2)
 );
 
 ```
 
-`INSERT INTO {TABLE} VALUES(값1, 값2, 값3 ...);` =>table 내 데이터 입력
+**`INSERT INTO TABLE[(열1,열,2...)]VALUES(값1,값2...)` =>table 내 데이터 입력**
 
 `INSERT INTO 컬럼명 생략`
 
 ```sql
-INSERT INTO userTBL VALUES ('KBS','김범수',1979,'경남','011',
-'11111111',173,'2012-4-5')
+--table(열) 생략 가능
+--생략 시 , VALUES 값 순서 및 개수를 TABLE에 정의된 순서와 개수 동일하게 입력
+
+INSERT INTO testTBL1 VALUES(1,'홍길동',25);
+
+INSERT INTO testTBL1(id, userName) VALUES(2,'설현');
+
+--열의 순서를 바꿔서 입력가능
+INSERT INTO testTBL1(userName, age, id) VALUES('지민',26,3);
+
 ```
 
 ### Date Type
