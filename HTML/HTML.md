@@ -394,3 +394,207 @@ height ⇒ 이미지 세로
 <!--./ 현재 디렉토리 -->
 ```
 
+
+
+#### 입력양식 태그
+
+> 사용자에게 정보를 입력받는 요소
+
+`<form>` => 입력 양식 시작과 끝 태그 (닫는 태그)
+
+​	속성
+
+​		action => data를 보내는 url 입력
+
+​		method => data 보내는 방식 (GET or POST)
+
+
+
+`<input>` =>사용자에게 입력받는 요소
+
+​	속성
+
+​		type
+
+​			text ⇒ 글자 입력 양식
+
+​			button ⇒ 버튼
+
+​			checkbox ⇒ 체크박스 (다중 선택)
+
+​			password ⇒ 비밀번호
+
+​			radio ⇒ 라디오 (단일 선택)
+
+​			file ⇒ 파일
+
+​			reset ⇒ 초기화버튼
+
+​			submit ⇒ 제출버튼
+
+
+
+​	name => Key 지정
+
+
+
+`<textarea>` => 여러 글자 입력 받는 요소 (닫는 태그)
+
+​	속성
+
+​		rows ⇒ 세로 크기
+
+​		cols ⇒  가로 크기
+
+
+
+`<select>` => 아이템 선택양식 (닫는태그) - `option` 태그와 세트
+
+`<option>` => 아이템 - `select` 태그와 세트
+
+`<label>` => 속성 for에 지정된 id와 연결
+
+
+
+```html
+<body>
+
+<!--  3(column) X (row) 10 테이블 생성 -->
+<form action="" method="">
+	<table>
+		<tr>
+			<td colspan=3>데이터수집</td>
+		</tr>
+		
+		<tr>
+			<td>이름</td>
+			<td><input type='text' name="user_name" value="kim"></td>
+			<td></td>
+		</tr>
+		
+		<tr>
+			<td>아이디</td>
+			<td><input type='text' name="user_id" value="ghkdrnjsm"></td>
+			<td><input type="button" value="중복검사"></td>
+		</tr>
+		
+		<tr>
+			<td rowspan="2">패스워드</td>
+			<td><input type='password' name="password" value="1234"></td>
+			<td></td>
+		</tr>
+		
+		<tr>
+			<td><input type='password' name="password2" value="1234"></td>
+			<td>
+				<button>패스워드 확인</button>
+			</td>
+		</tr>
+		
+		<tr>
+			<td>전화번호</td>
+			<td>
+			<!-- <input type='text' size="3" name="phone_no1"> - -->
+			<select name="phone_no1">
+				<option>--선택--</option>
+				<option selected="selected">010</option>
+				<option>051</option>
+				<option>02</option>
+			</select>
+			 
+			<input type='text' size="3" name="phone_no2"> - 
+			<input type='text' size="3" name="phone_no3">
+			</td>
+			<td></td>
+		</tr>
+		
+		<tr>
+			<td>이메일</td>
+			<td>
+				<input type='text' size="10" name="email1">@
+				<input type='text' size="10" name="email1">
+			</td>
+			<td>
+				<select name="email">
+					<option>--이메일 선택--</option>
+					<option>nate.com</option>
+					<option selected="selected">naver.com</option>
+					<option>google.com</option>
+				</select>
+			</td>
+		</tr>
+		
+		<tr>
+			<td>사용언어</td>
+			<td>
+				<input type='checkbox' name="langs" checked="checked">자바
+				<input type='checkbox' name="langs">파이썬
+				<input type='checkbox' name="langs">자바스크립트
+				<input type='checkbox' name="langs">C#
+			</td>
+			<td><button>다중선택확인</button></td>
+		</tr>
+		
+		<tr>
+			<td>사용툴</td>
+			<td>
+				<input type='radio' name="tools">이클립스
+				<input type='radio' name="tools" checked="checked">메모장
+				<input type='radio' name="tools">VSC
+			</td>
+			<td><button>단일선택확인</button></td>
+		</tr>
+		
+		<tr>
+			<td>비고</td>
+			<td>
+				<textarea rows="5" cols="30" name="etc">Welcome</textarea>
+			</td>
+			<td></td>
+		</tr>
+		
+		<tr>
+			<td colspan=3>
+				<input type="submit" value="전송">
+				<input type="reset" value="다시작성">
+			</td>
+	
+		</tr>
+		
+	</table>
+</form>
+
+</body>
+```
+
+
+
+#### 공간분할 태그
+
+`<div>` => Block (한줄)
+
+`<span>` => Inline (쓰는 만큼)
+
+
+
+#### 시맨틱 태그
+
+> 의미가 있는 태그
+
+시맨틱(semantic) : 의미론적인
+
+header, nav, section, footer 등등 웹 페이지 구역 나누는 태그
+
+
+
+`<header>` => 머리말 (페이지 제목, 소개)
+
+`<nav>`=> 네비게이션
+
+`<aside>` => 본 게시물 사이드 항목
+
+`<section>` => 본 게시물
+
+`<article>` =>본문과 독립적인 컨텐츠
+
+`<footer>` => 꼬리말 (저자나 저작권 정보)
