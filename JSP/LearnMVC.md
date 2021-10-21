@@ -4,7 +4,7 @@
 >
 > 웹 애플리케이션의 각 기능(클라이언트의 요청 처리, 응답 처리, 비즈니스, 로직 처리)를 분리해서 구현
 
-
+![MVC흐름도](md-images/MVC%ED%9D%90%EB%A6%84%EB%8F%84.PNG)
 
 ## MVC 특징
 
@@ -79,6 +79,144 @@ Model에서 처리한 결과를 화면에 구현하여 클라이언트로 전송
 
 
 
+## Connection Pool
+
+> DB와 연결시킨 상태를 유지하는 기술
+
+왜? 필요한가
+
+​	=>DB연결에 시간이 많이 걸리는 것을 보완하기 위해서
+
+How? 어떻게
+
+​	=> 웹 애플리케이션이 실행됨과 동시에 연동할 DB와의 연결을 미리 설정하여 필요할 때마다 미리 연결해 놓은 상태를 이용해 빠르게 DB와 연동하여 작업
+
+
+
+### JNDI (Java Naming and Directory Interface)
+
+> 필요한 자원을 Key/Value 쌍으로 저장한 후 필요할 떄 키를 이용해 값을 얻는 방법
+
+미리 접근할 자원에 키를 지정한 후 애플리케이션이 실행 중 일 때 이 키를 이용해 자원에 접근해서 작업을 하는 것
+
+```xml
+      <Context docBase="MVCBasic" path="/MVCBasic" reloadable="true" source="org.eclipse.jst.jee.server:MVCBasic">
+          
+      	<Resource auth="Container" driverClassName="com.mysql.cj.jdbc.Driver" maxIdle="4" maxTotal="8" name="jdbc/member" password="1234" type="javax.sql.DataSource" url="jdbc:mysql://localhost:3306/kdt13" username="root"/>
+          
+      </Context>
+```
+
+**속성 설명**
+
+name : DataSource에 대한 JNDI 이름
+
+auth : 인증 주체
+
+driverClassName : 연결할 DB Driver Class
+
+maxIdle : 동시에 idle 상태로 대기 할 수 있는 최대 수
+
+maxWait : 새로 연결이 생길 때까지 기다릴 수 있는 최대 시간
+
+user : DB 접속 ID
+
+password : DB 접속 pw
+
+type : DB 종류별 DataSource
+
+url : 접속할 DB 주소, 포트번호 및 SID
+
+### Connection(JNDI).java
+
+```java
+//DB JNDI 접근	
+public static Connection getConnection() {
+		Connection con = null;
+		Context initCtx = null;
+		
+		try {
+			initCtx = new InitialContext();									//JNDI에 접근하기 위해 기본 경로
+			Context envCtx = (Context) initCtx.lookup("java:comp/env");		//(java:/comp/env) 지정
+			DataSource ds = (DataSource)envCtx.lookup("jdbc/member");		//server.xml에 설정한 name=jdbc/membe의 DataSource 받기
+			con = ds.getConnection();										//DataSource 받아 DB 연결
+		} catch (NamingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		return con;
+	}
+```
+
+
+
+## 포워드
+
+> 서블릿에서 다른 서블릿이나 JSP로 요청을 전달 (추가데이터포함)
+
+
+
+### redirect
+
+> HttpServletResponse 객체의 sendRedircet() 메서드를 이용
+
+웹 브라우저에 재요청을 하는 방식 (서블릿 -> 브라우저 -> 서블릿)
+
+how? => sendRedirect(url);
+
+1. 클라이언트 웹 브라우저에서 첫 번째 서블릿 요청
+2. 첫 서블릿은 sendRedirect() 메서드를 이용해 두 번째 서블릿을 웹 브라우저를 통해 요청
+3. 웹 브라우저는 sendRedirect() 메서드가 지정한 두 번째 서블릿 다시 요청
+
+```java
+res.sendRedirect(url);
+```
+
+
+
+### dispatch
+
+> RequestDispathcer 클래스의 forward() 메서드를 이용
+
+일반적으로 포워딩 기능을 지칭
+
+서블릿이 직접 요청하는 방법 (서블릿 -> 서블릿)
+
+how? 
+
+​	RequestDispatcher dis = req.getRequestDispatcher(Servlet or jsp);
+
+​	dis.forward(req,res);
+
+	1. 클라이언트 웹 브라우저에서 첫 서블릿 요청
+ 	2. 첫 서블릿은 RequestDispatcher를 이용해 두 번째 서블릿 포워드 
+
+```java
+RequestDispathcer rd = null;
+rd = req.getRequestDispatcher(url);
+rd.forward(req, resp);
+```
+
+
+
+## 바인딩
+
+> 서블릿에서 다른 서블릿 or JSP로 대량의 데이터를 공유하거나 전달 을 위함
+
+사전적의미 : 두개를 하나로 묶는다.
+
+```java
+setAttribute(String name, Object obj) //데이터를 각 객체에 바인딩 Key(name), Value(obj)로 묶기
+getAttribute(String name)             //바인딩된 데이터를 key값으로 받기
+removeAttribute(String name)          //바인딩된 데이터 key 값 받아 삭제
+```
+
+
+
 ## MVC 연습 코드
 
 ### MemberController.java
@@ -90,6 +228,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 
+import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -109,25 +248,22 @@ public class MemberController extends HttpServlet {
 	@Override
 	protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 		// TODO Auto-generated method stub
-		req.setCharacterEncoding("UTF-8");					
-		resp.setContentType("text/html; charset=UTF-8");	
+		// /MVCBasic/CmdController?cmd=(?)
+		req.setCharacterEncoding("UTF-8");					//요청자 UTF-8 인코딩
+		resp.setContentType("text/html; charset=UTF-8");	//응답자 UTF-8 인코딩
 		
-        // /MVCBasic/CmdController?cmd= (?)
-            
 		String command = req.getParameter("cmd");				//queryString key=cmd의 value
+		String url = "./member/result.jsp";
 		MemberService service = new MemberService();
-		String url = null;
+		
+		RequestDispatcher rd = null;
 		
 		if (command.equals("list")) {							//command 값이 list면 조회
+			ArrayList<MemberVo> list= service.readAll();
+			req.setAttribute("key", list);
 			url = "./member/member_list.jsp";
 			
-			ArrayList<MemberVo> list= service.readAll();
-			HttpSession session = req.getSession();
-			session.setAttribute("key", list);
-			
 		} else if(command.equals("create")) {					//command == create 삽입
-			url = "./member/result.jsp?message=";
-			
 			String id = req.getParameter("user_id");			//요청자 중 Name=user_id 항목의 value 가져오기
 			String pwd = req.getParameter("user_pwd");
 			String name = req.getParameter("user_name");
@@ -137,20 +273,33 @@ public class MemberController extends HttpServlet {
 			boolean flag = service.createMember(vo);
 			System.out.println(vo);
 			if (flag) {
-				url = url+"input success";
+				//url = "/MVCBasic/CmdController?cmd=list";
+				url = "./CmdController?cmd=list";
 			} else {
-				url = url+"input fail";
+				req.setAttribute("message", "input fail");
 			}
 		} else if(command.equals("view_input")) {				//command 
 			url = "./member/member.jsp";
+		} else if(command.equals("remove")) {
+			String userId = req.getParameter("user_id");
+			
+			boolean flag = service.removeMember(userId);
+			if(flag) {
+				//url = "/MVCBasic/CmdController?cmd=list";
+				url = "./CmdController?cmd=list";
+			} else {
+				req.setAttribute("message", "remove fail");
+			}
+			
 		}
-
-		resp.sendRedirect(url);									//응답에 대한 url
+		rd = req.getRequestDispatcher(url);
+		rd.forward(req, resp);
+		
+		//resp.sendRedirect(url);
 
 	}
 	
 }
-
 ```
 
 ### MemberService.java
@@ -202,11 +351,9 @@ import mc.sn.manager.ConnectionManager;
 import mc.sn.vo.MemberVo;
 
 public class MemberDAO {
-    
-    //DB 내 INSERT
 	public boolean insertMember(MemberVo vo) {
 		boolean flag = false;
-		
+		//memberTBL에 삽입하는 코드
 		String sql = "insert into memberTBL(member_id,member_pwd,member_name,member_email) "
 				+ "values (?,?,?,?);";
 		Connection con = null;
@@ -237,7 +384,7 @@ public class MemberDAO {
 		return flag;
 	}
 	
-	//memberTBL 전체 조회
+	//전체 조회
 	public ArrayList<MemberVo> selectAll(){
 		ArrayList<MemberVo> list = null;
 		String sql = "select * from memberTBL;";
@@ -271,6 +418,36 @@ public class MemberDAO {
 		}
 		
 		return list;
+	}
+	
+	public boolean deleteMember(String userId) {
+		boolean flag = false;
+		
+		String sql = "delete from memberTBL where member_id=?";
+		
+		Connection con = null;
+		PreparedStatement stmt = null;
+		try {
+			con = ConnectionManager.getConnection();
+			stmt = con.prepareStatement(sql);
+					
+			stmt.setString(1,userId);
+			
+			int affectedCount = stmt.executeUpdate();
+			if(affectedCount>0) {
+				System.out.println("삭제 작업이 완료되었습니다.");
+				flag = true;
+			}
+			stmt.close();
+			con.close();
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} finally {
+			ConnectionManager.closeAll(con, stmt, null);
+		}
+		
+		return flag;
 	}
 }
 
@@ -358,19 +535,43 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
+import javax.naming.Context;
+import javax.naming.InitialContext;
+import javax.naming.NamingException;
+import javax.sql.DataSource;
+
 public class ConnectionManager {
-    
-	public static Connection getConnection() {
+	public static Connection getConnection2() {
 		Connection con = null;
-		String driver = "com.mysql.cj.jdbc.Driver";			
-		String url = "jdbc:mysql://localhost:3306/kdt13";	
-		String id = "root";									
+		String driver = "com.mysql.cj.jdbc.Driver";			//패키지(Driver.class 찾기)
+		String url = "jdbc:mysql://localhost:3306/kdt13";	//주소(프로토콜 : @주소)
+		String id = "root";									//DB 로그인 아이디
 		String pwd = "1234";		
 		
 		try {
 			Class.forName(driver);
 			con = DriverManager.getConnection(url,id,pwd);
 		} catch (ClassNotFoundException | SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		return con;
+	}
+	
+	public static Connection getConnection() {
+		Connection con = null;
+		Context initCtx = null;
+		
+		try {
+			initCtx = new InitialContext();
+			Context envCtx = (Context) initCtx.lookup("java:comp/env");
+			DataSource ds = (DataSource)envCtx.lookup("jdbc/member");
+			con = ds.getConnection();
+		} catch (NamingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
@@ -435,6 +636,8 @@ public class ConnectionManager {
 <%
 	SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 	String now = sdf.format(new Date());
+	
+	
 %>
 
 
@@ -480,7 +683,7 @@ public class ConnectionManager {
 	</table>
 </form>
 
-<a href="./list_req.jsp">조회 링크</a>
+<a href="/MVCBasic/CmdController?cmd=list">조회 링크</a>
 
 </body>
 </html>
@@ -499,7 +702,13 @@ public class ConnectionManager {
 </head>
 <body>
 
-Result
+<h1>Result</h1>
+<br>
+<%
+	String message = (String)request.getAttribute("message");
+	out.print(message);
+%>
+
 
 </body>
 </html>
@@ -546,10 +755,10 @@ Result
 <br>
 
 <table>
-	<tr><th>아이디</th><th>비밀번호</th><th>이름</th><th>이메일</th><th>가입일</th></tr>
+	<tr><th>아이디</th><th>비밀번호</th><th>이름</th><th>이메일</th><th>가입일</th><th>삭제</th></tr>
 
 <%
-	ArrayList<MemberVo> list = (ArrayList<MemberVo>)session.getAttribute("key");
+	ArrayList<MemberVo> list = (ArrayList<MemberVo>)request.getAttribute("key");
 	for(MemberVo vo : list){
 %>
 	<tr>
@@ -558,11 +767,16 @@ Result
 		<td><%=vo.getMemberName() %></td>
 		<td><%=vo.getMemberEmail() %></td>
 		<td><%=vo.getJoinDate().toLocaleString() %></td>
+		<td><a href="/MVCBasic/CmdController?cmd=remove&user_id=<%=vo.getMemberId() %>">삭제</a></td>
 	</tr>
 <%
 	}
 %>
-
+<tr>
+	<td colspan="6">
+		<a href="/MVCBasic/CmdController?cmd=view_input">멤버 추가하기</a>
+	</td>
+</tr>
 </table>
 
 </body>
