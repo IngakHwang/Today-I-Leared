@@ -68,3 +68,11 @@ Gradle의 경우 별도의 빌드스크립트를 통하여 사용할 어플리�
 
   - Configuration Injection 방식을 사용해서 공통 모듈을 상속해서 사용하는 단점을 커버했다.
   - 설정 주입시 프로젝트의 조건을 체크할 수 있어서 프로젝트별로 주입되는 설정을 다르게 할 수 있다.
+
+
+
+----
+
+[스프링 초기환경설정 : spring initalizr](https://start.spring.io/)
+
+[Mavenrepository](https://mvnrepository.com/)

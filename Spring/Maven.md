@@ -64,3 +64,7 @@ maven에서는 미리 정의하고 이쓴ㄴ 빌드 순서가 있으며 이 순�
 [참고링크1](https://hyojun123.github.io/2019/04/18/gradleAndMaven/)
 
 [참고링크2](https://okky.tistory.com/179)
+
+[스프링 초기환경설정 : spring initalizr](https://start.spring.io/)
+
+[Mavenrepository](https://mvnrepository.com/)
