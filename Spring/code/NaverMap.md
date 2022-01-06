@@ -84,8 +84,7 @@ Application 서비스 환경의 사Web 서비스 URL에 사용하고자 하는 u
 			    	  resultText = JSON.parse(data);
 			    	  var lang1 = resultText.addresses[0].x;
 			    	  var lat1 = resultText.addresses[0].y;
-			    	  $('#span_lat').text(lat1);
-			    	  $('#span_lang').text(lang1);
+
 			    	  var mapOptions = {
 							    center: new naver.maps.LatLng(lat1, lang1),
 							    zoom: 15
