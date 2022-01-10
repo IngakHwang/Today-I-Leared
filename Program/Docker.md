@@ -80,3 +80,9 @@ MySQL 이미지 = debian을 기반으로 MySQL을 실행하는 데 필요한 파
 
 새로운 서버가 추가되면 미리 만들어 놓은 이미지를 다운받고 컨테이너를 생성만 하면 된다.
 
+
+
+---
+
+출처 :  https://subicura.com/2017/01/19/docker-guide-for-beginners-1.html#%EC%84%9C%EB%B2%84%EB%A5%BC-%EA%B4%80%EB%A6%AC%ED%95%9C%EB%8B%A4%EB%8A%94-%EA%B2%83
+
