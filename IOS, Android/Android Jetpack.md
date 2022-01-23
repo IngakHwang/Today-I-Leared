@@ -93,3 +93,5 @@ Jetpack 컴포넌트는 안드로이드 API 플랫폼의 일부가 아니기 때
 참고사이트
 
 안드로이드 Jetpack 알아보기 velog : https://velog.io/@eoqkrskfk94/android-Jetpack
+
+안드로이드 Jetpack 이란 블로그 : https://todaycode.tistory.com/40?category=979455
