@@ -46,6 +46,8 @@ Client 소켓에서 연결요청을 하면 (올바른 port로 들어왔을 때) 
 
 
 
+소켓이란 무엇인가 블로그 : https://www.daleseo.com/what-is-a-socket/
+
 Socket 이란 블로그 : https://medium.com/@su_bak/term-socket%EC%9D%B4%EB%9E%80-7ca7963617ff
 
 소켓 통신이란 블로그 : https://helloworld-88.tistory.com/215
