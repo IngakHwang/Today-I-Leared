@@ -111,6 +111,10 @@ git의 기능은 많고, 로컬 저장소에 올리기 전에도 commit할 대�
 
 
 
+![What&#39;s the difference between HEAD, working tree and index, in Git? - Stack  Overflow](md-images/cZkcV.jpg)
+
+
+
 ## git 저장소 만들기
 
 ```bash
@@ -122,6 +126,16 @@ Initialized empty Git repository in C:/Users/student/Desktop/test/.git/
 
 * `.git` 폴더가 생성되며, 버전이 관리되는 저장소
 * git bash에서는 `(master)` 로 브랜치가 표기 된다. 
+
+
+
+## git 최초 설정
+
+`git config --global user.name 내이름`		 : 이름
+
+`git config --global user.email 내 이메일`	: 이메일 
+
+
 
 ## 버전 만들기
 
@@ -250,6 +264,140 @@ Date:   Wed Sep 29 15:17:30 2021 +0900
 
     third
 ```
+
+
+
+### `diff`
+
+> commit된 기록에 차이점 혹은 파일에 대한 변화를 알려준다.
+>
+> commit 하기 전에 자기가 작업을 한 내용에 문제가 있는지 없는지 확인하는 마지막 절차
+
+```bash
+$git diff
+```
+
+```bash
+$git diff commit번호1..commit번호2
+```
+
+#### 예시
+
+```bash
+$ git diff
+diff --git a/f1.txt b/f1.txt
+index 9462317..e3a30dc 100644
+--- a/f1.txt
++++ b/f1.txt
+@@ -1 +1 @@
+-f1.txt : 2
++f1.txt : 5
+```
+
+
+
+```bash
+$ git diff 9f5a60953734900a4b3aef0a875645505cf8decc..3cd014de879f86bebecfc77866ef253d9dae0800
+diff --git a/f1.txt b/f1.txt
+index 2456b16..e2eaf76 100644
+--- a/f1.txt
++++ b/f1.txt
+@@ -1 +1 @@
+-source : 2
++source : 1
+```
+
+
+
+## 과거로 돌아가기
+
+> **굉장히 신중하게 사용할 것**
+
+
+
+### `reset`
+
+> **(github에 올리기 전에 사용금지)** 
+>
+> reset은 내 컴퓨터에만 있는 버전에 대해서만 사용할 것
+>
+> reset은 github에 올리기 전에 복구를 해야할 때 사용할 것 
+
+> commit 되었던 기록들 중간으로 돌아가기
+>
+> ex) 1,2,3,4,5 번째 커밋 중 4,5 번째 지우고 3번째 기록으로 돌아가기
+
+```bash
+$git reset commit번호 --hard
+```
+
+
+
+#### 예시
+
+```bash
+USER@DESKTOP-EFG7BOL MINGW64 ~/Documents/gitfth (master)
+$ git log
+commit 08923f97e4f0d4e177bbaa609a4814a7875361a5 (HEAD -> master)
+Author: IngakHwang <ghkdrnjsm@gmail.com>
+Date:   Mon Feb 7 16:57:13 2022 +0900
+
+    5
+
+commit d22981c6e5d9c805e9ce94a4c16d221f7280bedc
+Author: IngakHwang <ghkdrnjsm@gmail.com>
+Date:   Mon Feb 7 16:32:18 2022 +0900
+
+    4
+
+commit 917e22a8effafa1e96215928ed8ced7700e3a855
+Author: IngakHwang <ghkdrnjsm@gmail.com>
+Date:   Mon Feb 7 16:28:20 2022 +0900
+
+    f2
+
+commit 9f5a60953734900a4b3aef0a875645505cf8decc
+Author: IngakHwang <ghkdrnjsm@gmail.com>
+Date:   Mon Feb 7 16:27:10 2022 +0900
+
+    2
+    
+commit 3cd014de879f86bebecfc77866ef253d9dae0800
+Author: IngakHwang <ghkdrnjsm@gmail.com>
+Date:   Mon Feb 7 16:24:20 2022 +0900
+
+    1
+
+USER@DESKTOP-EFG7BOL MINGW64 ~/Documents/gitfth (master)
+$ git reset 917e22a8effafa1e96215928ed8ced7700e3a855 --hard
+HEAD is now at 917e22a f2
+
+USER@DESKTOP-EFG7BOL MINGW64 ~/Documents/gitfth (master)
+$ git log
+commit 917e22a8effafa1e96215928ed8ced7700e3a855 (HEAD -> master)
+Author: IngakHwang <ghkdrnjsm@gmail.com>
+Date:   Mon Feb 7 16:28:20 2022 +0900
+
+    f2
+
+commit 9f5a60953734900a4b3aef0a875645505cf8decc
+Author: IngakHwang <ghkdrnjsm@gmail.com>
+Date:   Mon Feb 7 16:27:10 2022 +0900
+
+    2
+
+commit 3cd014de879f86bebecfc77866ef253d9dae0800
+Author: IngakHwang <ghkdrnjsm@gmail.com>
+Date:   Mon Feb 7 16:24:20 2022 +0900
+
+    1
+```
+
+
+
+### `revert`
+
+
 
 ## 원격 저장소 관련 명령어
 
@@ -468,3 +616,6 @@ git 관련 블로그 : https://ojava.tistory.com/157
 git book : http://git-scm.com/book/ko/v2
 
 git 관련 블로그 : http://marklodato.github.io/visual-git-guide/index-ko.html
+
+git 원리 동영상 - 생활코딩 : https://www.youtube.com/watch?v=KyGfapLpWhY&list=PLuHgQVnccGMA8iwZwrGyNXCGy2LAAsTXk&index=15
+
