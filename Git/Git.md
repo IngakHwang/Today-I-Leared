@@ -267,6 +267,48 @@ Date:   Wed Sep 29 15:17:30 2021 +0900
 
 
 
+`git log --branches --decorate` : 브랜치 별로 커밋 로그 조회
+
+`git log --branches --decorate --graph` : + 그래프로
+
+`git log --branches --decorate --graph --oneline` : + 그래프를 원라인으로 간단히
+
+`git log -p {branch1}..{branch2}` : branch1에는 없고 branch2에는 있는 커밋 로그 조회
+
+※ HEAD : 현재 Checkout(사용) 중인 branch
+
+```bash
+$ git log --branches --decorate
+commit dd0744681eed6680ec3914674462e113651aabcf (HEAD -> exp)	//branch
+Author: IngakHwang <ghkdrnjsm@gmail.com>
+Date:   Tue Feb 8 19:57:07 2022 +0900
+
+    exp2
+
+commit 5e4fe1633ff29337cf2ac389730d6cccd3ebd503
+Author: IngakHwang <ghkdrnjsm@gmail.com>
+Date:   Tue Feb 8 19:55:45 2022 +0900
+
+    exp
+
+commit 1518ca4bd355061f2f49237d98a23d3a55394c30 (master)		//master
+Author: IngakHwang <ghkdrnjsm@gmail.com>
+Date:   Mon Feb 7 17:15:15 2022 +0900
+
+    11
+
+commit 25ab5a886fb7ff7bfd48e46b842505af7a25608f
+Author: IngakHwang <ghkdrnjsm@gmail.com>
+Date:   Mon Feb 7 17:14:12 2022 +0900
+
+    10
+
+```
+
+ 
+
+
+
 ### `diff`
 
 > commit된 기록에 차이점 혹은 파일에 대한 변화를 알려준다.
@@ -506,7 +548,7 @@ Fast-forward
  create mode 100644 index.html
 ```
 
-### `git long --ineline --graph` 
+### `git log --oneline --graph` 
 
 > 브랜치 가지 확인
 
@@ -530,6 +572,56 @@ $ git log --oneline --graph
 * 25601f7 Use VSC for commit
 * c574e0f branch README commit
 ```
+
+### `git stash`
+
+> 작업하던 내용을 감출 때 사용하는 명령어 (워킹 디렉토리의 사항을 감추기) (버전관리추적파일만 해당)
+
+다른 브랜치에서 작업 중에 또 다른 브랜치로 이동해야 할 때 작업 중이던 내용을 감추기 위함
+
+```bash
+$git stash
+Saved working directory and index state WIP on exp: 9161e43 1
+HEAD is now at 9161e43 1
+```
+
+
+
+### `git stash apply` 
+
+> 감추었던 내용 복원
+
+```bash
+$git stash apply
+On branch exp
+Changes not staged for commit:
+	(use "git add <file>..." to update what will be committed)
+	(use "git checkout -- <file>..."to discard changes in working directory)
+	
+		modified : {파일이름}
+
+no changes added to commit (use "git add" and/or "git commit -a")
+```
+
+
+
+### `git stash list`
+
+> 감추었던 내용에 대한 리스트
+
+
+
+### `git stash drop`
+
+> stash 되었던 내용 중 최신 stash 삭제
+
+
+
+### `git stash pop` = `git stash apply; git stash drop;`
+
+> stash 되었된 내용 복원 및 stash리스트 내에서 삭제
+
+
 
 ## Undoing
 
