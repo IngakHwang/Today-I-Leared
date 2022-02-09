@@ -482,6 +482,13 @@ $git pull -u origin master
 ### `git clone 'url'`
 
 > github에 주소에 있는 Repositories 가져오기
+>
+> 포크할 디렉토리 내에서 할 것
+
+```bash
+$git clone 'https://github.com/git/git.git gitsrc'	#gitsrc 디렉토리 만들고 폴더 내에 clone
+													# . = 현재 디렉토리
+```
 
 `clone` 은 원격저장소 자체를 가져온다
 
@@ -506,6 +513,12 @@ $ git checkout 'newBranch'
 $ git checkout master
 Switched to branch 'master'
 ```
+
+### `git checkout {commit number}`
+
+> 해당 commit number 로 이동 (과거로 이동?)
+
+
 
 ### git checkout -b {branch name}
 
@@ -547,6 +560,54 @@ Fast-forward
  1 files changed, 0 insertions(+), 0 deletions(-)
  create mode 100644 index.html
 ```
+
+> Fast-forward
+>
+> 동일 내용이 포함되는 브랜치일 경우 브랜치 이동만으로 병합해서 따로 commit을 생성하지 않는 경우
+>
+> 서로 다른 상태를 병합하는 것이 아니고 master를 다른 branch 위치로 이동만 해도 되는 상태이기 때문에
+>
+> 별도의 merge를 위한 commit이 발생하지 않음
+
+
+
+> merge commit
+>
+> 서로 다른 상태의 브랜치를 병합해서 새로운 commit을 만드는 경우
+>
+> 아예 다른 결과물을 갖고 있는 master와 branch는 merge 되어 새로운 commit을 만든다.
+
+----
+
+fastword, mergecommit 차이점 : https://yuja-kong.tistory.com/51
+
+----
+
+
+
+**branch 충동해결** 
+
+ex)
+
+```bash
+function b(){
+
+}
+<<<<<<<<< HEAD					#중복되는 부분 시작
+function a(master){
+======
+function a(exp){
+>>>>>>>> exp					#중복되는 부분 끝
+}
+function c(){
+
+}
+
+```
+
+
+
+
 
 ### `git log --oneline --graph` 
 
