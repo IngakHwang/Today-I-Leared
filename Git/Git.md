@@ -194,6 +194,14 @@ $ git commit -m 'first'
 create mode 100644 a.txt
 ```
 
+
+
+ `commit --amend`
+
+> 최신 커밋 메시지 수정
+
+
+
 ## 상태 관련 명령어
 
 ### `status`
