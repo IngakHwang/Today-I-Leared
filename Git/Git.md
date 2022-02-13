@@ -131,9 +131,33 @@ Initialized empty Git repository in C:/Users/student/Desktop/test/.git/
 
 ## git 최초 설정
 
+> Git을 설치하고 나서 사용자이름과 이메일 주소를 설정한다.
+>
+> Git은 커밋할 때 마다 이 정보를 사용한다.
+
 `git config --global user.name 내이름`		 : 이름
 
 `git config --global user.email 내 이메일`	: 이메일 
+
+
+
+※`--global` 옵션으로 설정하는 것은 딱 한번만 하면된다.
+
+
+
+### `git config --list`
+
+> 설저한 모든 것을 보여준다.
+
+```bash
+$git config --list
+user.name=IngakHwang
+user.email=ghkdrnjsm@gmail.com
+core.editro=code --wait
+core.editor=code --wait
+core.autocrlf=true
+...
+```
 
 
 
