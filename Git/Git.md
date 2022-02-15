@@ -161,6 +161,21 @@ core.autocrlf=true
 
 
 
+### `git config alias`
+
+> Git 명령어 단축어
+
+```bash
+$ git config --global alias.co checkout
+$ git config --global alias.br branch
+$ git config --global alias.ci commit
+$ git config --global alias.st status
+```
+
+git commit 대신 git ci 만으로 커밋 할 수 있다
+
+
+
 ## 버전 만들기
 
 ### `add`
@@ -223,6 +238,16 @@ create mode 100644 a.txt
  `commit --amend`
 
 > 최신 커밋 메시지 수정
+
+```bash
+$git commit -m 'first commit'
+$git add forgotten_file
+$git commit --amend
+```
+
+※ --amend 옵션으로 커밋을 고치는 작업은, 이전의 커밋을 완전히 새로 고쳐서 새 커밋으로 변경하는 것을 의미한다.
+
+amend로 커밋을 수정하는 작업이 주는 장점은 마지막 커밋 작업에서 아주 살짝 뭔가 빠뜨린 것을 넣거나 변경하는 것을 새 커밋으로 분리하지 않고 하나의 커밋에서 처리하는 것이다. (또 새로 커밋을 만들지 않겟다)
 
 
 
@@ -386,6 +411,10 @@ index 2456b16..e2eaf76 100644
 ## 과거로 돌아가기
 
 > **굉장히 신중하게 사용할 것**
+>
+> git reset 명령은 매우 위험하다
+>
+> 특히 --hard 옵션과 사용하면 더욱 위험하다
 
 
 
@@ -469,13 +498,48 @@ Date:   Mon Feb 7 16:24:20 2022 +0900
 
 
 
+> Staging Area, Working Directory 사이
+
+```bash
+$git add .
+$git status
+On branch master
+Changes to be committed:
+  (use "git reset HEAD <file>..." to unstage)
+  renamed: README.md -> README
+  modified: CONTRIBUTING.md
+```
+
+
+
+```bash
+$ git reset HEAD CONTRIBUTING.md
+Unstaged changes after reset:
+M CONTRIBUTING.md
+$ git status
+On branch master
+Changes to be committed:
+  (use "git reset HEAD <file>..." to unstage)
+  renamed: README.md -> README
+Changes not staged for commit:
+  (use "git add <file>..." to update what will be committed)
+  (use "git checkout -- <file>..." to discard changes in working
+directory)
+  modified: CONTRIBUTING.md
+
+```
+
+
+
+
+
 ### `revert`
 
 
 
 ## 원격 저장소 관련 명령어
 
-### `git remote add origin "저장소 url"`
+### `git remote add "단축이름" "저장소 url"`
 
 > 원격저장소(Github) 등록
 
@@ -494,6 +558,63 @@ $ git remote -v
 origin  https://github.com/IngakHwang/first.git (fetch)
 origin  https://github.com/IngakHwang/first.git (push)
 ```
+
+### `git remote show <리모트저장소이름>`
+
+> 리모트 저장소의 구체적인 정보 확인
+
+```bash
+$git remote show origin
+* remote origin
+  URL: https://github.com/my-org/complex-project
+  Fetch URL: https://github.com/my-org/complex-project
+  Push URL: https://github.com/my-org/complex-project
+  HEAD branch: master
+  Remote branches:
+  master tracked
+  dev-branch tracked
+  markdown-strip tracked
+  issue-43 new (next fetch will store in
+remotes/origin)
+  issue-45 new (next fetch will store in
+remotes/origin)
+  refs/remotes/origin/issue-11 stale (use 'git remote prune' to
+remove)
+  Local branches configured for 'git pull':
+  dev-branch merges with remote dev-branch
+  master merges with remote master
+  Local refs configured for 'git push':
+  dev-branch pushes to dev-branch
+(up to date)
+  markdown-strip pushes to markdown-strip
+(up to date)
+  master pushes to master
+(up to date)
+```
+
+
+
+### `git remote rename <기존리모트저장소이름> <변경할저장소이름>`
+
+> 리모트 저장소 이름 변경 (origin -> paul)
+
+```bash
+$git remote rename origin paul
+```
+
+
+
+### `git remote remove <삭제할저장소이름>`
+
+> 리모트 저장소 삭제 (rm도 가능)
+
+```bash
+$git remote remove paul
+```
+
+
+
+
 
 ### `git push origin master`
 
@@ -523,6 +644,8 @@ $git clone 'https://github.com/git/git.git gitsrc'	#gitsrc 디렉토리 만들�
 ```
 
 `clone` 은 원격저장소 자체를 가져온다
+
+저장소를 Clone 하면 'origin' 이라는 리모트 저장소가 자동으로 등록된다.
 
 
 
