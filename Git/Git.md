@@ -658,7 +658,7 @@ $git clone 'https://github.com/git/git.git gitsrc'	#gitsrc 디렉토리 만들�
 > 브랜치 생성
 
 ```bash
-$ git checkout 'newBranch'
+$ git branch 'newBranch'
 ```
 
 ### `git branch` 
