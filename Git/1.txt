@@ -1,3 +1,4 @@
-function1 (master)
-function2 (issue)
-function3
+function 1(master)
+function 2(issue)
+funciton 3(master issue)
+
