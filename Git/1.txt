@@ -1,0 +1,3 @@
+function1 (master)
+function2 (issue)
+function3
