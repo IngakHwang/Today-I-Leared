@@ -364,6 +364,8 @@ Date:   Mon Feb 7 17:14:12 2022 +0900
 
  
 
+`git log --decorate` : 브랜치가 가지고 있는 커밋 가리키기
+
 
 
 ### `diff`
@@ -659,6 +661,17 @@ $git clone 'https://github.com/git/git.git gitsrc'	#gitsrc 디렉토리 만들�
 $ git checkout 'newBranch'
 ```
 
+### `git branch` 
+
+> branch 목록 조회
+
+```bash
+$ git branch
+* master
+```
+
+
+
 ### `git checkout {branch name}` 
 
 > 현재 브랜치에서 {branch name}으로 이동
@@ -683,15 +696,6 @@ Switched to branch 'master'
 ~/Desktop/branch (master)			#(feature/index 브랜치생성 후 이동)
 $ git checkout -b 'feature/index'
 Switched to a new branch 'feature/index'
-```
-
-### `git branch` 
-
-> branch 목록 조회
-
-```bash
-$ git branch
-* master
 ```
 
 ### `git branch -d {branch name}`
@@ -740,7 +744,15 @@ fastword, mergecommit 차이점 : https://yuja-kong.tistory.com/51
 
 
 
-**branch 충동해결** 
+#### **branch 충동해결** 
+
+Merge 하는 두 브랜치에서 같은 파일의 한 부분을 동시에 수정하고 Merge 하면 git은 해당 부분을 Merge 하지 못한다.
+
+Merge 충돌이 일어났을 때 Git이 어떤 파일을 Merge 할 수 없었는지 `git status` 를 이용하면 알 수 있다.
+
+충돌이 일어난 파일은 `unmerged` 상태로 표시된다.
+
+Git은 충돌이 난 부분을 표준 형식에 따라 표시해준다. 그러면 개발자는 해당 부분을 수동으로 해결한다.
 
 ex)
 
