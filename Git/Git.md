@@ -629,6 +629,12 @@ $git push -u origin master		#master = branch
 ### `git pull origin master`  
 
 > Github 저장소 땡겨오기
+>
+> 원격저장소에서 가져온 변경내용을 로컬에 병합하는 것
+>
+> 하지만 로컬에서 작업하다가 변경된 내용을 pull 할 경우 충돌이 날 수도 있다.
+>
+> fetch 후 pull이 로컬에서 깨끗하게 사용하기 좋다.
 
 ```bash
 $git pull -u origin master
@@ -648,6 +654,28 @@ $git clone 'https://github.com/git/git.git gitsrc'	#gitsrc 디렉토리 만들�
 `clone` 은 원격저장소 자체를 가져온다
 
 저장소를 Clone 하면 'origin' 이라는 리모트 저장소가 자동으로 등록된다.
+
+
+
+### `git fetch 원격저장소이름` 
+
+> 원격저장소에서 파일을 병합하기 전에 병합을 할지 말지 확인 할 수 있는 명령어
+>
+> 원격저장소의 내용을 가져오는 데, 가져온 변경 내용을 로컬에 영향을 미치지 않으며, 병합하기전에 확인하는 용도로 사용하는 것이 좋다.
+
+> 로컬 저장소와 원격 저장소의 변경 사항이 다를 때 이를 비교 대조하고 git merge 명령어와 함께 최신 데이터를 반영하거나 충돌 문제 등을 해겨한다.
+
+
+
+##### git fetch, git pull 차이
+
+1. git fetch 란?
+
+   **페치(fetch)**는 원격 저장소의 커밋들을 로컬 저장소로 가져온다. 그리고 자동으로 **병합(Merge)**를 해주지 않기 때문에 본인이 직접 확인을 한 후에 **병합(Merge)**하는 과정을 거쳐야한다. 
+
+2. git pull 이란?
+
+   **git pull**이란 원격 저장소의 정보를 가져오면서 자동으로 로컬 브랜치에 **병합(Merge)**까지 수행해주는 명령어이다.
 
 
 
@@ -939,3 +967,6 @@ git 관련 블로그 : http://marklodato.github.io/visual-git-guide/index-ko.htm
 
 git 원리 동영상 - 생활코딩 : https://www.youtube.com/watch?v=KyGfapLpWhY&list=PLuHgQVnccGMA8iwZwrGyNXCGy2LAAsTXk&index=15
 
+git fetch vs git pull : https://chaeyoung2.tistory.com/43
+
+git merge vs rebase : https://velog.io/@kwonh/Git-Rebase%EB%9E%80
