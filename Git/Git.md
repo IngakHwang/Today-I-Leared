@@ -663,7 +663,37 @@ $git clone 'https://github.com/git/git.git gitsrc'	#gitsrc 디렉토리 만들�
 >
 > 원격저장소의 내용을 가져오는 데, 가져온 변경 내용을 로컬에 영향을 미치지 않으며, 병합하기전에 확인하는 용도로 사용하는 것이 좋다.
 
-> 로컬 저장소와 원격 저장소의 변경 사항이 다를 때 이를 비교 대조하고 git merge 명령어와 함께 최신 데이터를 반영하거나 충돌 문제 등을 해겨한다.
+> 로컬 저장소와 원격 저장소의 변경 사항이 다를 때 이를 비교 대조하고 git merge 명령어와 함께 최신 데이터를 반영하거나 충돌 문제 등을 해결한다.
+
+```bash
+$git fetch
+remote: Enumerating objects: 6, done.
+remote: Counting objects: 100% (6/6), done.
+remote: Compressing objects: 100% (1/1), done.
+remote: Total 4 (delta 2), reused 4 (delta 2), pack-reused 0
+Unpacking objects: 100% (4/4), 324 bytes | 10.00 KiB/s, done.
+From https://github.com/IngakHwang/Today-I-Leared
+ * [new branch]      my-another-idea -> origin/my-another-idea
+```
+
+```bash
+$ git branch -a
+  master
+* my-another-idea
+  my-idea
+  remotes/origin/master
+  remotes/origin/my-another-idea
+  remotes/origin/my-idea
+```
+
+```bash
+$git checkout -b my-idea origin/my-idea			#origin 원격저장소의 my-idea 브랜치의 내용을
+												#로컬저장소 my-idea 브랜치에 넣고 checkout함
+```
+
+
+
+
 
 
 
