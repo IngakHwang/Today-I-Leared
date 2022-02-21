@@ -1000,3 +1000,5 @@ git 원리 동영상 - 생활코딩 : https://www.youtube.com/watch?v=KyGfapLpWh
 git fetch vs git pull : https://chaeyoung2.tistory.com/43
 
 git merge vs rebase : https://velog.io/@kwonh/Git-Rebase%EB%9E%80
+
+git 유튜브 알코 : https://www.youtube.com/watch?v=GaKjTjwcKQo&t=437s
