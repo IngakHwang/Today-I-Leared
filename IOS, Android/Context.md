@@ -14,6 +14,13 @@ context : 맥락, 전후 사정, 문맥
 
 
 
+Google Developer 문서
+
+> 애플리케이션 환경에 대한 글로벌 정보에 대한 인터페이스로 안드로이드 시스템에서 구현을 제공하는 추상클래스 입니다.
+> 이를 통해 애플리케이션 별 리소스 및 클래스 액세스 할 뿐만 아니라 활동 시작, 인텐트 브로드 캐스트 수신등과 같은 애플리케이션 수준 작업에 대한 상향 호출이 가능하다.
+
+
+
 ## 이것이 안드로이드다 책
 
 > context 는 시스템을 사용하기 위한 정보(프로퍼티)와 도구(메서드)가 담겨 있는 클래스 이다.
@@ -183,6 +190,18 @@ BroadcastReceiver 가 호출될 때( onReceive() ) 전해지는 Context 는 모�
 
 
 
+## 언제 Context와 appContext를 사용할까?
+
+대부분의 경우 현재 작업 중인 것을 둘러싸는 컴포넌트에서 직접 사용할 수 있는 context를 사용한다.
+
+참조가 해당 컴포넌트의 라이프사이클을 넘어서지 않는 이상 참조를 안전하게 유지 할 수 있다.
+
+
+
+액티비티나 서비스 이외의 객체에서 Context 에 대한 참조를 저장해야 하는 할 때 appContext를 사용 하자
+
+
+
 ---
 
 참고사이트
@@ -192,3 +211,5 @@ BroadcastReceiver 가 호출될 때( onReceive() ) 전해지는 Context 는 모�
 네이버 블로그 : https://blog.naver.com/huewu/110085457720
 
 네이버 블로그2 : https://blog.naver.com/huewu/110085391353
+
+Shinjekim 깃헙 : https://shinjekim.github.io/android/2019/11/01/Android-context%EB%9E%80/

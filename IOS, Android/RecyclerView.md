@@ -109,6 +109,8 @@ Recycler 사전적의미 : 재생처리기, 재활용하는 사람
 > 리사이클러뷰에 표시될 아이템 뷰를 생성하는 역할
 >
 > 사용자 데이터 리스트로부터 아이템 뷰를 만드는 것
+>
+> 데이터와 리사이클러뷰를 연결
 
 ![리사이클러뷰의 구성 요소 - Adapter](https://t1.daumcdn.net/cfile/tistory/994890405C88BD1A02)
 
@@ -117,6 +119,22 @@ Recycler 사전적의미 : 재생처리기, 재활용하는 사람
 수직 방향으로 아이템을 배치 할 수 있는 리스트뷰와 다르게, 리사이클러뷰는 다양한 형태로 아이템을 배치할 수 있다.
 
 이를 위해, 어댑터에서 아이템 뷰를 생성하기 이전에, 어떤 형태로 배치될 아이템 뷰를 만들 것인지를 결정하는 요소가 레이아웃 매니저 이다.
+
+
+
+----
+
+**안드로이드 책**
+
+어댑터 클래스의 기본 구성
+
+어댑터가 정상적으로 동작하려면 미리 정의된 Holder 클래스를 제네릭으로 지정 후 어댑터에 설계되어 있는 3개의 인터페이스를 구현해야 한다.
+
+- `onCreateViewHolder()` : 한 화면에 그려지는 아이템 개수만큼 레이아웃 생성
+- `onBindViewHolder()` : 생성된 아이템 레이아웃에 값 입력 후 목록에 출력
+- `getItemCount()` : 목록에 보여줄 아이템의 개수
+
+---
 
 
 
@@ -142,15 +160,95 @@ Recycler 사전적의미 : 재생처리기, 재활용하는 사람
 
 
 
+---
+
+**안드로이드 책**
+
+레이아웃 매니저 종류 (3가지)
+
+1. LinearLayoutManager
+
+   - 세로 스크롤 : 기본으로 세로 스크롤, 일반 리스트 처럼 한 줄로 목록 생성, 생성자에 context 1개만 입력
+
+     `LinearLayoutManager(this)`
+
+   - 가로 스크롤 : 컬럼 개수를 지정해서 개수만큼 그리드 형태로 목록 생성, 두번째 파라미터에 가로 스크롤 옵션 지정
+
+     `LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)` 
+
+2. GridLayoutManager
+
+   데이터의 사이즈에 따라 그리드의 크기가 변경
+
+   두번째 파라미터에 한 줄에 몇 개의 아이템 표시 할지 개수 설정
+
+   `GriedLayoutManager(this, 3)`
+
+3. StaggeredGridLayoutManager
+
+   - 세로 스크롤 : 컨텍스트를 사용하지 않으므로 this를 넘기지 않아도 된다. 첫 번째 파라미터는 한 줄에 표시되는 아이템 개수, 두 번째 파라미터는 세로 방향 설정
+
+     `StaggeredGridLayoutManager(3, StaggeredGridLayoutManager.VERTICAL)`
+
+   - 가로 스크롤 : 두 번째 파라미터에 가로 방향 설정
+
+     `StaggeredGridLayoutManager(3, StaggeredGridLayoutManager.HORIZONTAL)`
+
+----
+
+
+
 ### 뷰홀더 (ViewHolder)
 
 > 화면에 표시될 아이템 뷰를 저장하는 객체이다.
+>
+> 개별 데이터에 대응
 
 ![리사이클러뷰의 구성 요소 - ViewHolder](https://t1.daumcdn.net/cfile/tistory/9954BA3F5C88BD1A37)
 
 어댑터에 의해 관리되는데, 필요에 따라 (레이아웃매니저의 아이템 뷰 재활용 정책에 따라) 어댑터에서 생성된다.
 
 미리 생성된 뷰홀더 객체가 있는 경우에는 새로 생성하지 않고 이미 만들어져 있는 뷰홀더를 재활용하는데, 이 때는 단순히 데이터가 뷰홀더의 아이템 뷰에 바인딩 (Binding) 된다.
+
+
+
+---
+
+**안드로이드 책**
+
+![image-20220303175520654](https://tva1.sinaimg.cn/large/e6c9d24egy1gzwsp767r7j212e0fqq4i.jpg)
+
+뷰홀더는 현재 화면에 보여지는 개수만큼만 생성되고 목록이 위쪽으로 스크롤 될 경우 가장 위의 뷰홀더를 아래에서 재사용한 후 데이터만 바꿔주기 때문에 앱의 효율이 향상된다.
+
+ViewHolder 클래스의 생성자에는 다음에 만들 어댑터의 아이템 레이아웃을 넘겨줘야 하므로 Holder클래스를 생성할 때 생성자에게서 레이아웃의 바인딩을 넘겨받아야 한다.
+
+![image-20220303175504825](https://tva1.sinaimg.cn/large/e6c9d24egy1gzwsoyoq7ij2178062dgc.jpg)
+
+ViewHolder에 빨간색 오류줄이 뜨는 데, 생성자에 1개의 값이 필수로 입력되어야 하기 떄문이다.
+
+아이템 레이아웃은 ViewHolder 자체에서 만들지 않고 어댑터가 만들어서 넘겨준다.
+
+
+
+어댑터에서 넘겨주는 바인딩을 자식 클래스의 생성자에게서 받고
+
+부모의 생성자에게로 넘겨주는 구조 이다.
+
+
+
+부모의 생성자는 바인딩이 아닌 View 필요하기 때문에 `binding.root` 를 전달
+
+```kotlin
+class Holder(val binding: ItemRecyclerBinding): RecyclerView.ViewHolder(binding.root){}
+```
+
+
+
+뷰홀더가 사용하는 바인딩은 어댑터에서 생성한 후 넘겨준다.
+
+----
+
+
 
 
 
@@ -251,7 +349,9 @@ data class Memo(var no: Int, var title: String, var timestamp: Long)
 
 ### 어댑터 구현
 
-
+> 데이터와 리사이클러뷰를 연결
+>
+> 뷰홀더는 개별 데이터에 대응
 
 리스트뷰의 경우, 어댑터를 사용할 때 안드로이드 SDK에서 제공되는 몇 가지 어댑터 중 하나를 선택하거나, 필요한 경우(커스텀 리스트뷰)에 `BaseAdapter` 클래스를 상속받아 새로운 어댑터를 만들었던 것에 반해
 
@@ -302,6 +402,15 @@ class Holder(val binding: ItemRecyclerBinding): RecyclerView.ViewHolder(binding.
     }
 
 }
+
+
+/*
+class 홀덩 (바인딩) : RecyclerView.ViewHolder (바인딩.root){}
+
+ViewHolder 클래스의 생성자에는 다음에 만들 어댑터의 아이템 레이아웃을 넘겨줘야 하므로
+Holder 클래스를 생성할 때 생성자에게 레이아웃의 바인딩을 넘겨받아야 한다.
+
+*/
 ```
 
 
@@ -313,6 +422,24 @@ class Holder(val binding: ItemRecyclerBinding): RecyclerView.ViewHolder(binding.
 
 
 이렇게 작성한 뷰홀더는 어댑터의 `onCreateViewHolder()` 와 `onBindViewHolder()` 메서드를 통해 각각 생성 및 바인딩 (데이터 표시)되어 화면에 표시된다.
+
+
+
+---
+
+**안드로이드 책**
+
+Inflate(inflater, parent, attachToRoot) 파라미터의 의미
+
+- inflater : 바인딩을 생성할 때 사용하는 인플레이터, 액티비티에서와는 다르게 `LayoutInflater.from` 을 사용
+- parent : 생성되는 바인딩이 속하는 부모 뷰(레이아웃)
+- attachToRoot : true 일 시 attach 해야 하는 대상으로 root를 지정하고 아래에 붙는다. false일 시 뷰의 최상위 레이아웃의 속성을 기본으로 레이아웃이 적용
+
+
+
+----
+
+
 
 
 
@@ -365,6 +492,61 @@ class MainActivity : AppCompatActivity() {
 
 
 
-## 예제 실행 화면
+### 예제 실행 화면
 
 ![image-20220302173230525](https://tva1.sinaimg.cn/large/e6c9d24egy1gzvmf6wqh7j20le14kq5n.jpg)
+
+
+
+
+
+## 리사이클러뷰 클릭 이벤트 처리
+
+
+
+
+
+
+
+----
+
+**안드로이드 책**
+
+> 목록에서 아이템 1개가 클릭 되었을 때 처리 하는 방법
+
+간단하게 홀더가 가지고 있는 아이템뷰에 클릭리스너를 달고,
+
+리스너 블록에 실행할 코드만 추가하면 목록이 클릭 될 때 마다 해당 코드가 실행
+
+
+
+ViewHolder 클래스가 생성되는 시점에 클릭리스너를 추가하기 위해 클래스에 init 추가
+
+```kotlin
+class Holder(val binding: ItemRecyclerBinding): RecyclerView.ViewHolder(binding.root) {
+	init {
+    binding.root.setOnClickListener {
+      // 클릭 실행 코드
+      Toast.makeText(binding.root.context, "클릭된 아이템 = ${binding.textTitle.text}",Toast.LENGTH_LONG).show()
+    }
+  }
+
+}
+```
+
+----
+
+
+
+----
+
+참고 사이트
+
+개발자 레시피 티스토리 블로그 : https://recipes4dev.tistory.com/154?category=790402
+
+
+
+참고 서적
+
+이것이 안드로이드 책
+
