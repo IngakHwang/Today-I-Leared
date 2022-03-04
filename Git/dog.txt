@@ -1,3 +1,0 @@
-name : mong-eeh
-bark : wang-wang
-

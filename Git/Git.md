@@ -539,6 +539,45 @@ directory)
 
 
 
+### `checkout "commit해시값" `
+
+> 특정 commit 했던 시기로 돌아가기
+
+```bash
+$ git log
+commit 1685263ea6f306cfbf48d33e53ca8dece8e717bc (HEAD -> master)
+Author: IngakHwang <ghkdrnjsm@gmail.com>
+Date:   Fri Mar 4 11:27:15 2022 +0900
+
+    update recyclerview CREATE, UPDATE, DELETE
+
+commit 296d82320873b6fa2b222c01f949697dbceb47cb (origin/master, origin/HEAD)
+Author: IngakHwang <ghkdrnjsm@gmail.com>
+Date:   Thu Dec 16 17:32:48 2021 +0900
+
+    update readme
+
+commit 28e9d10e347b48b650eb6cd149efd4fd99f4adf0
+Author: IngakHwang <ghkdrnjsm@gmail.com>
+Date:   Tue Dec 14 17:36:02 2021 +0900
+
+    update android readme
+
+commit 2ac6cca276c1d9443f19de4da3f8e952b4fefbd6
+Author: IngakHwang <ghkdrnjsm@gmail.com>
+Date:   Tue Dec 14 17:18:29 2021 +0900
+
+    add
+    
+$git checkout 296d823							# 해당 커밋으로 돌아가기
+
+$git checkout master							# master 브랜치로 돌아가기
+```
+
+
+
+ 
+
 ## 원격 저장소 관련 명령어
 
 ### `git remote add "단축이름" "저장소 url"`
@@ -1002,3 +1041,5 @@ git fetch vs git pull : https://chaeyoung2.tistory.com/43
 git merge vs rebase : https://velog.io/@kwonh/Git-Rebase%EB%9E%80
 
 git 유튜브 알코 : https://www.youtube.com/watch?v=GaKjTjwcKQo&t=437s
+
+git 과거로 갔다가 돌아오기 : https://mytory.net/archives/10078
