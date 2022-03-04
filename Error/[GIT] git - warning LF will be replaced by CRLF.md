@@ -1,4 +1,4 @@
-# git - warning: LF will be replaced by CRLF
+# [GIT] git - warning: LF will be replaced by CRLF
 
 > 형상 관리를 해주는 git이 바라볼 땐 어느 쪽을 선택할지 몰라 경고 메세지를 띄워준 것
 

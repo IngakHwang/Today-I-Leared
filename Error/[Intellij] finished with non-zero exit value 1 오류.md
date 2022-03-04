@@ -1,4 +1,4 @@
-# finished with non-zero exit value 1 오류
+# [Intellij] finished with non-zero exit value 1 오류
 
 
 
