@@ -858,6 +858,56 @@ fun.sleep()
 
 
 
+----
+
+**생활코딩 - 자바수업**
+
+
+
+abstract : 추상
+
+상속을 강제하는 일종의 규제라고 먼저 생각하자.
+
+abstract 클래스나 메소드를 사용하기 위해선 반드시 상속해서 사용하도록 강제하는 것이 abstract 이다.
+
+
+
+추상 메소드 (abstract method)
+
+메소드의 시그니처만이 정의된 비어있는 메소드이다.
+
+구체적인 구현은 하위 클래스에서 오버라이딩 해야 한다.
+
+
+
+추상 클래스 (abstract class)
+
+상속을 강제하기 위한 것이다.
+
+메소드의 시그니처만 정의해놓고, 메소드의 실제 동작 방법은 메소드를 상속받은 하위 클래스의 책임으로 위임하는 것이다.
+
+
+
+ex) templeate method pattern
+
+![img](https://s3.us-west-2.amazonaws.com/secure.notion-static.com/88b33bcd-de8f-4a44-ad0e-586b53c2aa56/Untitled.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=AKIAT73L2G45EIPT3X45%2F20220310%2Fus-west-2%2Fs3%2Faws4_request&X-Amz-Date=20220310T092336Z&X-Amz-Expires=86400&X-Amz-Signature=a9e9848a27827e22105e9917716bdfac9cfae59a26538fe3d045d79d56a4b98b&X-Amz-SignedHeaders=host&response-content-disposition=filename%20%3D%22Untitled.png%22&x-id=GetObject)
+
+이 그림에 등장하는 템플릿은 자주 사용하는 모양을 모아둔 것이라고 할 수 있다.
+
+템플릿은 모양을 결정하지만 템플릿을 통해 그려질 도형은 팬의 종류나 색상에 따라 달라진다.
+
+즉, 추상화 메소드가 어떻게 동작할지 알 순 없지만 실행은 할 것이다.
+
+하지만 실행결과는 하위 클래스가 결정한다.
+
+
+
+----
+
+
+
+
+
 ### 인터페이스
 
 > 외부 모듈에 제공하기 위해 메서드 이름을 나열한 명세서
