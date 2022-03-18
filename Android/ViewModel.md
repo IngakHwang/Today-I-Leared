@@ -189,3 +189,7 @@ medium - https://charlezz.medium.com/viewmodel%EC%9D%B4%EB%9E%80-%EB%AC%B4%EC%97
 
 
 tistory - https://todaycode.tistory.com/33?category=979455
+
+
+
+공홈 - https://developer.android.com/topic/libraries/architecture/viewmodel?hl=ko
