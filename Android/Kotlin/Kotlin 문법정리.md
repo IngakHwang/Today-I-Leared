@@ -44,6 +44,179 @@ ex) `const val PI = 3.14` -> (타입추론) 상수PI에 3.14 선언
 
 
 
+#### get(), set()
+
+`var` 는 변수, `val` 는 상수가 아니다. 둘 다 변수 이다.
+
+
+
+코틀린 클래스에서 `val` ,`var` 로 정의되는 변수를 프로퍼티라고 한다.
+
+자바에서의 멤버 변수인 field 와는 다르다.
+
+
+
+프로퍼티는 `field + getter/setter 메소드` 라고 볼 수 있다.
+
+프로퍼티를 생성하면 getter / setter가 자동으로 생성되기 때문이다.
+
+(private val/var은  자바의 field 와 동일하다.)
+
+(private은 getter, setter를 만들지 않기 때문이다.)
+
+
+
+코틀린에서 프로퍼티를 정의하면 getter/setter 함수를 만들지 않고 그냥 직접 접근하여 사용하면된다.
+
+하지만 실제로 직접 접근하지 않는다.
+
+내부적으로 `get()`, `set()` 을 사용하며 코틀린 코드에서는 이 부분이 생략이 되었다고 볼 수 있다.
+
+
+
+코틀린의 프로퍼티는 다음과 같은 규칙으로 getter / setter 를 생성한다.
+
+- val 은 불변 (immutable) 이기 때문에 getter 만 생성된다.
+- var 은 변하기 (mutable) 때문에 getter / setter 가 모두 생성된다.
+- getter의 이름은 `get + 변수이름` , setter의 이름은 `set + 변수이름` 으로 정해진다.
+- `isStudent` 처럼 변수 이름에 is가 붙는다면, getter는 `is + (is를 제거한 이름)` , setter는 `set + (is를 제거한 이름)` 이 된다.
+- private 변수는 getter / setter가 생성되지 않는다.
+
+
+
+ex)
+
+```kotlin
+// val get() 사용
+
+class test {
+  val name : Int
+  	get(){
+      return this.age
+    }
+}
+```
+
+
+
+##### 커스텀 get, set
+
+프로퍼티를 정의하면 getter / setter 가 생성된다.
+
+변수에 값을 변경하거나 리턴만 한다.
+
+다른 계산, 로그 출력 등의 코드가 없지만 추가 할 수 있다.
+
+프로퍼티에 `get()`, `set()` 함수를 정의하면 된다.
+
+
+
+```kotlin
+class Rectangle {
+  var width = 10
+  	set(value){
+      field = value / 2						//field = 해당 변수, value = 입력 값
+    }
+  
+  var height = 10
+  	set(value){
+      field = value / 2
+    }
+  var area : Int = 0
+  	get() = width * height
+}
+
+fun main(){
+  val rect = Rectangle()
+  println("width: ${rect.width}")								//width : 10
+  println("height: ${rect.height}")							//height : 10
+  println("area: ${rect.area}")									//area : 100
+  
+  rect.width = 40
+  rect.height = 40
+  println("width: ${rect.width}")								//width : 20
+  println("height: ${rect.height}")							//height : 20
+  println("area: ${rect.area}")									//area : 400
+  
+}
+```
+
+
+
+##### private setter
+
+지금까지 만든 프로퍼티는 외부에서 변수를 변경하고(set), 읽을 수 있었다(get).
+
+getter, setter를 모두 만들었는데, 외부에서 변수를 변경(set)하지 못하도록 할 수 있다.
+
+
+
+`set()` 을 private 으로 선언하면 된다.
+
+```kotlin
+class Rectangle {
+    var width = 10
+        private set(value) {
+            field = value / 2
+        }
+    var height = 10
+        private set(value) {
+            field = value / 2
+        }
+    var area: Int = 0
+        get() = width * height
+}
+
+// 외부에서 객체의 변수를 변경할 수 없습니다
+val rect = Rectangle()
+//rect.width = 40
+//rect.height = 40
+```
+
+
+
+----
+
+참고사이트 : https://codechacha.com/ko/kotlin-property/
+
+---
+
+
+
+## Print , Log 값 접근
+
+> Print나 Log를 할 때 값을 변수에 담지 않고 `$` 키워드나 `${}` 를 사용하여 값 접근
+
+ex)
+
+**Java**
+
+```java
+String text = "테스트변수"
+println("text 변수는 "+text)
+
+//text 변수는 테스트변수
+  
+Log.d("LOG", "text - "+text)
+```
+
+
+
+**Kotlin**
+
+```kotlin
+val text : String = "테스트변수"
+println("text 변수는 $text")
+
+//text 변수는 테스트변수
+
+Log.d("LOG", "text - $text")
+```
+
+
+
+
+
 ## 조건문
 
 > 범위가 넓고 범위 자체를 한정 할 수 없다 -> if문
@@ -693,7 +866,7 @@ cutePig.walk()                    //Pig가 걸어간다. 출력
 
 
 
-### 데이터 클래스
+### data class
 
 > 간단한 값의 저장 용도로 사용
 >
@@ -890,7 +1063,7 @@ abstract 클래스나 메소드를 사용하기 위해선 반드시 상속해서
 
 ex) templeate method pattern
 
-![img](https://s3.us-west-2.amazonaws.com/secure.notion-static.com/88b33bcd-de8f-4a44-ad0e-586b53c2aa56/Untitled.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=AKIAT73L2G45EIPT3X45%2F20220310%2Fus-west-2%2Fs3%2Faws4_request&X-Amz-Date=20220310T092336Z&X-Amz-Expires=86400&X-Amz-Signature=a9e9848a27827e22105e9917716bdfac9cfae59a26538fe3d045d79d56a4b98b&X-Amz-SignedHeaders=host&response-content-disposition=filename%20%3D%22Untitled.png%22&x-id=GetObject)
+![img](https://s3.ap-northeast-2.amazonaws.com/opentutorials-user-file/module/516/1972.png)
 
 이 그림에 등장하는 템플릿은 자주 사용하는 모양을 모아둔 것이라고 할 수 있다.
 
@@ -986,3 +1159,371 @@ K → Key
 
 V → Value
 
+
+
+### enum class
+
+> 관련 있는 상수들의 집합 class
+>
+> 상태 모드 등 유사한 값들을 고유한 값으로 만들어 사용하기 위해 사용한다.
+>
+> `enum class 클래스명(){}`
+
+Enum => Eumeration : 열거형 => 서로 연관된 상수들의 집합
+
+
+
+- 코드가 간략해지며 가독성이 높아진다.
+- 인스턴스 생성과 상속을 방지하여 타입 안전성 보장한다.
+- 구현 의도가 명확해진다.
+- 상태 모드 등 유사한 값들을 고유값으로 만들어 사용하기 위해서 사용한다.
+
+
+
+구현
+
+- `enum class 클래스명(){}`
+- 클래스 안에 메소드 정의 시 상수 목록과 메소드 정의 사이에 `;` 넣어야 한다.
+
+ex)
+
+```kotlin
+enum class Color (val r: Int, val g: Int, val b: Int){
+	RED(255, 0, 0),
+	GREEN(0, 255, 0),
+	BLUE(0, 0, 255);
+
+	fun rgb() = (r * 256 + g) * 256 + b
+}
+
+fun colorName(color : Color) =
+	when(color){
+		color.RED = "빨강"
+		color.GREEN = "초록"
+		color.BLUE = "파랑"
+	}
+	
+fun main(){
+	println(colorName(Color.BLUE))       //"파랑"
+}
+```
+
+-----
+
+참고 사이트
+
+1. https://json8.tistory.com/170
+2. https://tourspace.tistory.com/99?category=797357
+
+-----
+
+
+
+
+## 블록
+
+> 프로그램 코드에서 블록 (block) 이란 마치 한 문단처럼 보이는, 코드의 한 부분을 뜻함
+>
+> 중괄호로 묶여 있는 경우가 많다.
+
+블록 = 코드 블록 = Unit
+
+```kotlin
+// 전형적인 블록
+fun answerString() : String 
+// 블록 시작
+{
+	var hello = "hello"
+	return hello
+}
+// 블록 끝
+```
+
+
+
+## nullable, Non-nullable
+
+> 코틀린은 자바와 다르게 Nullable, Non-nullable 타입으로 프로퍼티를 선언 할 수 있다.
+>
+> Non-nullable 타입으로 선언 시 객체가 null이 아닌 것을 보장하기 때문에 null check 코드 작성을 할 필요가 없다.
+
+
+
+> 코틀린은 null에 안전하도록 설계 되었다.
+
+
+
+코틀린 기본 변수는 모두 null 입력이 되지 않는다.
+
+
+
+### `?`  => null 허용
+
+> null 입력받기 허용
+>
+> 타입 뒤에 `?` 작성 => nullable (null 할당 가능)
+>
+> 없으면 non-Nullable (null 할당 불가능)
+>
+> `var 변수명 : 타입?` 
+
+```kotlin
+var nullable: String? = "nullable"        //nullable
+var nonNullable: String = "non-Nullable"  //non-Nullable
+```
+
+함수 파라미터에도 null 허용 여부를 설정할 수 있다.
+
+null을 허용하려면 해당 파라미터에 대한 null 체크를 먼저 해야만 사용가능
+
+```kotlin
+fun nullParameter(str: String?){
+	if(str != null){
+		var length2 = str.length
+	}
+}
+```
+
+함수 리턴 타입에도 nullable 여부를 설정 가능
+
+```kotlin
+fun nullReturn(): String?{
+	return null
+}
+```
+
+
+
+### `!!` => null 아니라는 것 보장
+
+> null이 아니라는 것을 보장할 수 있는 객체에만 사용
+>
+> 메서드 뒤에 사용
+
+```kotlin
+// nonNullString 은 Non-nullable
+// getString() 은 nullable  이라고 가정 한다.
+
+//컴파일 에러
+//String?타입을 String에 할당하려고 했기 때문
+var nonNullString: String = getString()  
+
+//컴파일 성공
+var nonNullString: String = getString()!!
+```
+
+
+
+### `?.` => safe call (값이 null 이 아닐 때 값 호출)
+
+> 값이 Null 인지 체크 후 실행을 위함
+>
+> null이 아니면 `?.` 다음에 나오는 속성, 명령어 처리
+>
+> null이면 null 리턴
+>
+> Safe call 연산자 (안전하게 nullable 프로퍼티 접근)
+
+```kotlin
+val a: String = "Kotlin"
+val b: String? = null
+println(b?.length)      //b가 null 이라면 length를 호출하지 않고 null 리턴
+println(a?.length)      //if(a==null) return null else a.length
+```
+
+
+
+```kotlin
+fun testSafeCall(str: String): Int?{
+	//str이 null이면 length를 체크하지 않고 null을 반환
+	var resultNull: Int? = str?.length
+	return resultNull
+}
+```
+
+
+
+### `?:` => elvis (값이 null 일 때, 아닐 때 리턴 값이 다르다.)
+
+> null이 아니면 `?:` 왼쪽 값 리턴
+>
+> null이면 `?:` 오른쪽 값 리턴
+>
+> 엘비스 연산자 (Elvis Operation)
+>
+> 삼항 연산자와 비슷하다.
+
+```kotlin
+//null이 아니라면 ?: 왼쪽 객체 리턴
+//null이라면 ?:의 오른쪽 객체 리턴
+val 1 = b?.length ?: -1
+```
+
+
+
+```kotlin
+fun testElvis(str: String): Int{
+	//length 오른쪽에 ?: 사용하면 null 일 경우 ?: 오른쪽의 값이 반환
+	var resultNonNull: Int = str?.length?:0
+}
+```
+
+
+
+## 지연 초기화
+
+> 초기화 타이밍을 늦추는 효과
+>
+> 코틀린은 코드 초반에 초기화 해야 하는데 그 초기화를 나중에 하겠다.
+
+
+
+### `lateinit` => var 전용 지연 초기화
+
+> 클래스 안에서 변수 (프로퍼티)만 미리 선언하고 초기화 (생성자 호출)를 나중에 해야 할 경우
+
+
+
+- var로 선언된 클래스의 프로퍼티에만 사용 가능
+- null은 허용되지 않는다.
+- 기본 자료형 (Int, Long, Double 등등) 에서 사용 불가
+
+
+
+`lateinit` 은 변수를 미리 선언만 해 놓은 방식이기에 초기화되지 않는 상태에서 메서드나 프로퍼티 참조 시 null 예외 발생
+
+​	=> 이러한 문제로 잘 사용하진 않는다.
+
+
+
+예시)
+
+```kotlin
+class Person{
+	lateinit var name: String
+	init {
+		name = "Lionel"
+	}
+	fun process(){
+		name.plus(" Messi")
+		print("이름 길이 = ${name.length}")
+		print("이름 첫글자 = ${name.substring(0,1}")
+	}
+}
+```
+
+
+
+### `lazy` => val 전용 지연 초기화
+
+> lazy 초기화된 항목은 실제 실행 시 메모리에 올라감으로 메모리 입장에서 좋음
+>
+> 자주 쓰인다.
+
+
+
+변수 선언 후 코드 뒤 쪽에 `by lazy` 키워드 붙여 사용
+
+```kotlin
+class Test{
+  val myName : String by lazy {
+    "John"
+  }
+}
+```
+
+
+
+----
+
+`lateinit` ,`lazy` 참고 사이트 : https://medium.com/til-kotlin-ko/kotlin-delegated-property-by-lazy%EB%8A%94-%EC%96%B4%EB%96%BB%EA%B2%8C-%EB%8F%99%EC%9E%91%ED%95%98%EB%8A%94%EA%B0%80-74912d3e9c56
+
+----
+
+
+
+
+
+## Scope function, Standard function
+
+> 범위를 일시적으로 만들어 속성, 함수를 처리하는 용도로 사용되는 함수
+
+스코프 함수 : 특정 객체의 컨텍스트 내에서 특정 동작 을 실행하기 위한 목적만을 가진 함수
+
+
+
+스코프 함수를 람다 함수로 사용하게 되면 임시로 스코프를 형성한다.
+
+이 스코프 내에서 객체의 이름을 통해 일일이 참조할 필요 없이 객체를 접근하고 핸들링 할 수 있다.
+
+`?` 남용을 막아주는 역할도 한다.
+
+
+
+1. ‘it’ 을 쓰는지, ‘this’ 를 쓰는지 ⇒ it은 인자명 지정 가능, 기본적으로  it 으로 접근
+2. 리턴값이 함수 실행인지, 객체 인지
+
+
+
+it을 쓰는 이유 => 변수명을 지정해서 보는 사람이 보기 편하도록 하기 위함
+
+
+
+`apply` : this, 객체 리턴
+
+`run` : this, 함수 실행
+
+`with` : this, 함수 실행, 파라미터 사용
+
+`let` : it, 함수 실행
+
+`also` : it, 객체 리턴
+
+
+
+-----
+
+Scope function 사용에 대한 참고 사이트
+
+1. https://medium.com/androiddevelopers/kotlin-standard-functions-cheat-sheet-27f032dd4326
+2. https://medium.com/@kimtaesoo188/mastering-kotlin-standard-functions-run-with-let-also-and-apply-7fb4492db246
+
+-----
+
+
+
+## Method Chaining
+
+> 메소드 리턴 객체를 받고 이 리턴 객체의 메소드를 호출하는 방법을 반복 (메소드를 체인으로 엮듯이)
+
+
+
+> 둘 이상의 메서드 호출 또는 속성 엑세스를 단일 표현식으로 결합하는 것
+>
+> Method Chaining 사용 시 임시 변수의 사용을 줄일 수 있다.
+>
+> 코드를 더 쉽게 읽고 유지 관리 할 수 있다.
+
+ex)
+
+```kotlin
+// No Chained method calls
+Double cost = binding.costOfService
+String costString = cost.toString()
+
+// Chained method calls
+String costString = binding.costOfService.toString()
+```
+
+
+
+
+
+
+
+----
+
+읽어 보면 좋은 사이트
+
+1. 코틀린 스타일 가이드 : https://developer.android.com/kotlin/style-guide
+2. 코틀린 키워드 연산자 : https://runebook.dev/ko/docs/kotlin/docs/reference/keyword-reference

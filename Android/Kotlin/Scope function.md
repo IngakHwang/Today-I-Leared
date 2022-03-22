@@ -37,11 +37,11 @@ Kotlin에서는 총 5개의 Scope function이 있다.
 
 `apply` : this, 객체 리턴
 
-`run` : this, 함수 마지막줄
+`run` : this, 함수 실행
 
-`with` : this, 함수 마지막줄, 파라미터 사용
+`with` : this, 함수 실행, 파라미터 사용
 
-`let` : it, 함수 마지막줄, null 체크
+`let` : it, 함수 실행, null 체크
 
 `also` : it, 객체 리턴
 
