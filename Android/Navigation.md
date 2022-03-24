@@ -20,6 +20,33 @@ Android Jetpack의 Navigation은 이러한 Navigation의 의미에 맞게 사용
 
 
 
+## Single Activity Multi Fragment
+
+> 하나의 액티비티를 두고 나머지 화면을 모두 프래그먼트로 구성하는 아키텍처
+
+
+
+**장점**
+
+1. 하나의 Activity에 Fragment를 사용하여 다양한 View를 보여줄 수 있다.
+2. UI의 재사용이 용이하다.
+3. 한 Activity 내의 데이터 전달로 같은 프로세스 안의 통신으로 성능 향상
+4. 기존 Activity 전환 시 화면 전체가 교체되는 낭비 해결
+5. 공통적인 부분 개발의 편의성
+
+---
+
+참고 사이트
+
+1. https://oozou.com/blog/reasons-to-use-android-single-activity-architecture-with-navigation-component-36
+2. https://handnew04.github.io/posts/2020-11-15/
+
+----
+
+
+
+
+
 ## 구성 요소
 
 >  3가지 구성 요소
@@ -96,11 +123,24 @@ NavHoast 라고 불리는 것은 NavHostFragment로 구현된다.
 
 ### NavController
 
-
+> 이동을 담당하여 관리한다.
 
 NavController는 앱 탐색을 직접 관리하는 객체
 
 즉, 앱 내에서 사용자가 개별 컨텐츠(=destination)들을 탐색하며 이동할 때 NavHost에서 destination의 전환을 NavController를 통해 조율한다.
+
+
+
+## Navigation 장점
+
+1. 프래그먼트 전화의 처리
+2. up and back 작업에 대한 올바른 처리
+3. 애니메이션과 화면 전환에 대한 표준화된 리소스 제공
+4. deep link 구현 및 처리
+5. navigation drawers, bottom navigation에 대한 ui 패턴을 최소한의 품으로 사용 할 수 있게 해준다.
+6. Safe Args 라는 플러그인 사용, 화면 간의 데이터 전달에 대한 안전성 제공
+7. viewModel 서포트 (AAC Viewmodel)
+8. navigation edtior를 통하여 gui로 확인
 
 
 
@@ -343,3 +383,5 @@ findNavController() 메소드 인자에 nav_graph에 존재하는 fragmentSecond
 참고사이트
 
 김초희 깃험 : https://choheeis.github.io/newblog//articles/2020-08/navigation
+
+공 홈 : https://developer.android.com/guide/navigation
