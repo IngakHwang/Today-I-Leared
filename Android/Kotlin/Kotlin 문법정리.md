@@ -1517,6 +1517,122 @@ String costString = binding.costOfService.toString()
 
 
 
+## Pair, Triple
+
+함수는 1개의 객체를 리턴한다.
+
+하지만 간혹 2개의 값을 리턴하고 싶을 때가 있다.
+
+이럴 때 클래스를 만들어 그 안에 필요한 값을 저장하고 리턴하거나, 배열을 만들어 그 안에 저장하고 리턴할 수 있다.
+
+
+
+코틀린은 Pair, Triple 객체를 기본으로 제공하여 이런 불편함을 해소하려고 한다.
+
+Pair는 2개의 객체를 저장할 수 있는 객체이고,
+
+Triple은 3개의 객체를 저장하는 객체이다.
+
+
+
+### 사용법
+
+> Pair는 객체를 생성하고 2개의 객체를 넣을 수 있다.
+>
+> 안에 들어가는 객체의 클래스 또는 자료형은 중요하지 않고 두개가 동일해도 되고 달라도 된다.
+
+
+
+```kotlin
+val pair1 = Pair("Hello", "World")
+val pair2 = Pair("Hello", 1234)
+```
+
+타입을 생략할 수 있지만 명시적으로 타입을 쓸 수도 있다.
+
+```kotlin
+val pair3 = Pair<String, String> ("Hello", "World")
+val pair4 = Pair<String, Int> ("Hello", 1234)
+```
+
+
+
+Pair 안에 저장된 객체는 `first` , `second` 로 접근 할 수 있다.
+
+```kotlin
+val pair = Pair("Hello", 1234)
+println(pair.first)					//Hello
+prinlnt(pair.second)				//1234
+```
+
+
+
+새로운 변수를 정의할 때 Pair를 이용하여 쉽게 값을 할당 할 수 있다.
+
+```kotlin
+val (hello, number) = Pair("Hello", 1234)
+println(hello)							//Hello
+println(number)							//1234
+```
+
+
+
+> Triple은 객체를 생성하고 3개의 객체를 넣을 수 있다.
+>
+> Pair와 사용방법은 동일하고 3번째 객체 참조는 `third` 를 이용
+
+----
+
+Pair, Thiple 사용방법 : https://codechacha.com/ko/kotlin-pair-and-triple/
+
+---
+
+
+
+## 확장 함수 (Extension Functions)
+
+> 기존의 정의된 클래스에 함수를 추가하는 기능
+
+
+
+자신이 만든 클래스는 새로운 함수를 쉽게 추가 할 수 있는데,
+
+Standard Library 또는 다른 사람이 만든 라이브러리를 사용할 때 함수를 추가하기가 매우 어렵다.
+
+코틀린에서는 위의 고충을 해결 할 수 있게 기존의 정의된 클래스에 함수를 추가 할 수 있다.
+
+
+
+### 사용법
+
+> fun 클래스이름.함수이름(인자타임): 리턴타입 {구현부}
+
+ex) List 클래스에 `getHigherThan()` 함수 추가
+
+```kotlin
+fun List<Int>.getHigherThan(num : Int) : List<int>{
+  val result = arrayListOf<int>()
+  for (item in this){
+    if (item > num) {
+      result.add(item)
+    }
+  }
+  return result
+}
+
+fun main(){
+  val numbers : List<Int> = listOf(1,2,3,4,5,6)
+  val filtered = numbers.getHigherThan(3).toString()
+  println(filtered)
+}
+```
+
+----
+
+확장 함수 사용방법 : https://codechacha.com/ko/kotlin-extension-functions/
+
+-----
+
 
 
 

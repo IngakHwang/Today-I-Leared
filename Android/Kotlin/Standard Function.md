@@ -1,16 +1,22 @@
-# Scope function
+# Standard function
+
+> Kotlin에서 제공하는 기본적인 함수들
+
+Scope function만 있는 줄 알았지만 takeif, takeunless도 있고
+
+심지어 repeat 또한 standard function 이다.
+
+
+
+## Scope function
 
 > 특정 객체에 대한 작업을 블록 안에 넣어 실행 할 수 있도록 하는 함수
 >
 > 범위를 일시적으로 만들어 속성, 함수를 처리하는 용도로 사용되는 함수
 
-
-
 특정 객체에 대한 작업을 블록안에 넣게 되면 가독성이 증가하고 유지보수가 쉬워진다.
 
 
-
-## Kotlin standard function
 
 스코프 함수 : 특정 객체의 컨텍스트 내에서 특정 동작을 실행하기 위한 목적만을 가진 함수
 
@@ -20,7 +26,7 @@
 
 
 
-Kotlin에서는 총 5개의 Scope function이 있다.
+Kotlin에서 주로 쓰는 Scope function이 있다.
 
 `apply` , `run` , `with` , `let`, `also` 
 
@@ -212,6 +218,54 @@ fun main(){
 
 
 
+## 그 외
+
+
+
+### takeIf
+
+```java
+public inline fun <T> T.takeIf(predicate: (T) -> Boolean): T? 
+    = if (predicate(this)) this else null
+```
+
+1. T 의 확장함수 이다. 즉, `T.takeIf` 로 사용 할 수 있다.
+2. takeIf의 조건 함수 predicate는 파라미터로 T 객체를 전달 받는다.
+3. takeIf의 조건 함수 predicate 의 결과에 따라 T 객체인 자기 자신(this) 나 null 을 반환한다.
+
+
+
+ex)
+
+```kotlin
+//원본 코드
+if (someObject != null && someObject.status){
+  someObject.doThis()
+}
+
+//개선 코드
+someObject?.takeIf{ status }?.doThis()
+```
+
+
+
+
+
+### takeUnless
+
+```java
+public inline fun <T> T.takeUnless(predicate: (T) -> Boolean): T? 
+    = if (!predicate(this)) this else null
+```
+
+takeUnless 함수는 takeIf 함수와 역으로 동작한다.
+
+takeUnless 는 조건함수가 true 일 때 null을 반환, false 일 때 자기 자신(this)를 반환한다.
+
+
+
+
+
 ---
 
 참고사이트
@@ -229,3 +283,7 @@ Kotlin: 스코프 함수들(Scope functions) let, run, with, apply, also 블로�
 
 
 언제 뭘 써야돼? 헷갈리는 스코프 함수들 velog : https://velog.io/@haero_kim/%EC%96%B8%EC%A0%9C-%EB%AD%98-%EC%8D%A8%EC%95%BC%EB%8F%BC-%ED%97%B7%EA%B0%88%EB%A6%AC%EB%8A%94-%EC%8A%A4%EC%BD%94%ED%94%84-%ED%95%A8%EC%88%98%EB%93%A4-%ED%95%9C-%EB%B0%A9-%EC%A0%95%EB%A6%AC#4-also--let
+
+
+
+takeif, takeUnless medium : https://medium.com/@limgyumin/%EC%BD%94%ED%8B%80%EB%A6%B0-%EC%9D%98-takeif-takeunless-%EB%8A%94-%EC%96%B8%EC%A0%9C-%EC%82%AC%EC%9A%A9%ED%95%98%EB%8A%94%EA%B0%80-f6637987780
