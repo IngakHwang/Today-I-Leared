@@ -1029,13 +1029,9 @@ fun.sleep()
 
 설계 단계에서 코드를 작성하지 않고 메서드의 이름만 작성
 
-
-
 ----
 
 **생활코딩 - 자바수업**
-
-
 
 abstract : 추상
 
@@ -1078,6 +1074,77 @@ ex) templeate method pattern
 ----
 
 
+
+####  Sealed class
+
+Super class를 상속받는 Child 클래스의 종류 제한하는 특성을 갖고 있는 클래스이다.
+
+어떤 클래스를 상속받는 하위 클래스는 여러 파일에 존재할 수 있기 때문에 컴파일러는 얼마나 많은 하위 클래스들이 있는지 알지 못한다.
+
+하지만 Sealed class 는 동일 파일에 정의된 하위 클래스 외에 다른 하위 클래스는 존재하지 않는다는 것을 컴파일러에게 알려주는 것과 같다.
+
+
+
+ex)
+
+`Color` 라는 상위 클래스를 만들고, 동일한 파일에 이 클래스를 상속하는 `Red`, `Blue` 라는 클래스를 선언했다고 가정
+
+Sealed class는 이 두개의 클래스 외에 `Color` 클래스를 상속받는 다른 클래스는 없다라는 것을 컴파일러에게 말해준다.
+
+
+
+이렇게 하위 클래스가 될 수 있는 클래스를 제한하여 얻을 수 있는 장점 중 하나는 `when` 을 사용할 때 `else` 를 사용하지 않는 것이다.
+
+이것은 코틀린에서 제공하는 Enum으로도 얻을 수 있는 이점이다.
+
+하지만 Enum은 `Red` 라는 하위 객체를 Singleton 처럼 1개만 생성할 수 있고 복수의 객체는 생성할 수는 없다.
+
+반면에 Sealed class는 1개 이상의 객체를 생성할 수 있다.
+
+
+
+**정의 방법**
+
+```kotlin
+sealed class Color
+
+object Red : Color()
+object Green : Color()
+object Blue : Color()
+
+
+//사용
+val color : Color = Red
+val color2 : Color = Color.Red
+```
+
+
+
+**특징**
+
+- 클래스 앞에 `sealed` 키워드를 붙여 정의
+- Sealed class 는 abstract 클래스로, 객체로 생성할 수 없다.
+- Sealed class의 생성자는 private이고, public으로 설정할 수 없다.
+- Sealed class와 그 하위 클래스는 동일한 파일에 정의되어야 한다. 서로 다른 파일에서 정의할 수 없다.
+- 하위 클래스는 `class` , `data class` , `object class` 으로 정의 할 수 있다.
+
+
+
+**이점**
+
+하위 클래스를 제한해서 얻는 이점 중 하나는 `when` 을 사용할 때 이다.
+
+`when` 은 모든 케이스에 대해서 처리가 되어야 하기 때문에 `else` 구문이 꼭 들어가는데, 
+
+`Sealed class` 를 사용하면 컴파일 시점에 하위 클래스들이 정해져 있기 때문에, 모든 하위 클래스에 대한 케이스를 구현하면 `else` 구문을 추가하지 않을 수 있다.
+
+
+
+----
+
+참고사이트 코드 차차 - https://codechacha.com/ko/kotlin-sealed-classes/
+
+---
 
 
 
@@ -1632,6 +1699,20 @@ fun main(){
 확장 함수 사용방법 : https://codechacha.com/ko/kotlin-extension-functions/
 
 -----
+
+
+
+## Keyword
+
+### external
+
+> C++로 작성된 함수를 실행 할 때의 키워드
+
+Java에서는 JNI (Java Native Interface)를 이용하여 C++로 작성된 함수를 실행할 때 `native` 키워드를 이용해서 함수를 선언해준다.
+
+Kotlin에서는 `external` 키워드를 이용한다.
+
+`public external fun Hello()`
 
 
 
