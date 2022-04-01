@@ -306,7 +306,7 @@ drawPerson()은 언제든 진입, 탈출 할 수 있는 자격이 주어진다.
 
 그러나 CPU는 단 한 개 뿐이다.
 
-따라서 왼쪽에 조금, 오른쪽에 족므을 반복하기 위해서 CPU가 매번 쓰레드를 점유했다가 놓아주고, 새로운 쓰레드를 점유했다가 놓아주고를 반복해야 한다. 
+따라서 왼쪽에 조금, 오른쪽에 조금을 반복하기 위해서 CPU가 매번 쓰레드를 점유했다가 놓아주고, 새로운 쓰레드를 점유했다가 놓아주고를 반복해야 한다. 
 
 이를 컨텍스트 스위칭이라고 한다.
 
@@ -437,3 +437,7 @@ suspend goCompany(person : Person){
 참고사이트
 
 쾌락코딩 깃헙 : https://wooooooak.github.io/kotlin/2019/08/25/%EC%BD%94%ED%8B%80%EB%A6%B0-%EC%BD%94%EB%A3%A8%ED%8B%B4-%EA%B0%9C%EB%85%90-%EC%9D%B5%ED%9E%88%EA%B8%B0/
+
+Gisdeveloper 코루틴 예제 : http://www.gisdeveloper.co.kr/?p=10279
+
+티스토리 : https://whyprogrammer.tistory.com/596 

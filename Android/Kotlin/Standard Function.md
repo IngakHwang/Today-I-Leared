@@ -224,6 +224,12 @@ fun main(){
 
 ### takeIf
 
+> null이 아니거나 조건이면 작업 수행
+>
+> 조건함수가 true이면 this 반환
+>
+> false이면 null 반환
+
 ```java
 public inline fun <T> T.takeIf(predicate: (T) -> Boolean): T? 
     = if (predicate(this)) this else null
@@ -252,6 +258,10 @@ someObject?.takeIf{ status }?.doThis()
 
 
 ### takeUnless
+
+> 조건함수가 true이면 null 반환
+>
+> false이면 this 반환
 
 ```java
 public inline fun <T> T.takeUnless(predicate: (T) -> Boolean): T? 

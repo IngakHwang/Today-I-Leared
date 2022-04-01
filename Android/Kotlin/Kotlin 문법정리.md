@@ -1716,6 +1716,46 @@ Kotlin에서는 `external` 키워드를 이용한다.
 
 
 
+### invoke
+
+> 이름 없이 간편하게 호출될 수 있는 함수
+
+코틀린에는 `invoke` 라는 특별한 함수, 정확히는 연산자가 존재한다.
+
+`invoke` 연산자는 이름 없이 호출될 수 있다.
+
+이름 없이 호출된다는 의미는 아래 코드와 같다.
+
+```kotlin
+object MyFunction{
+  operator fun invoke(str : String) : String{
+    return str.toUpperCase()	// 모두 대문자로 바꿔줌
+  }
+}
+```
+
+`MyFunction` 이라는 오브젝트가 있다.
+
+`object` 키워드로 만들었기에 `MyFunction` 은 하나의 객체처럼 사용될 수 있다.
+
+즉, 하나의 객체이기 때문에 객체 안의 메서드를 호출하기 위해서 아래와 같이 호출하고 싶을 것이다.
+
+```kotlin
+MyFunction.invoke("hello")
+```
+
+물론 잘 동작하지만, kotlin에서 `invoke` 라는 이름으로 만들어진 함수는 특별한 힘을 갖는다.
+
+이름 없이 실행 될 수 있는 힘이다.
+
+즉, 아래와 같이 호출이 가능하다.
+
+```kotlin
+MyFunction("hello")
+```
+
+
+
 
 
 ----
