@@ -88,13 +88,22 @@ runTimer(scope : CoroutineScope, delayTime: Long, block: () -> Unit) : 코루틴
 
 탐구필요클래스
 
-DistanceHelper.kt		 	: 정확하게 파악 필요
-
-TrackerModule.class		: GPS 관련 클래스
+DistanceHelper.kt
 
 Bluetooth 관련 클래스(BluetoothAdapter.class)
 
+ObdDataProvider.kt
 
 
 
+reactivex.rxjava3
 
+coroutine				
+
+​	MutableStateFlow, flow, collect, launch, CoruntineScope, Job, 
+
+LocationManager
+
+
+
+TrackerModule.class		: GPS 관련 클래스, compiled code 라고 기재되어 있음

@@ -14,7 +14,7 @@
 
 
 
-## Coroutine란
+## Coroutine 이해
 
 코루틴을 3가지 키워드 정도로 알아 볼 수 있다.
 
@@ -432,6 +432,397 @@ suspend goCompany(person : Person){
 
 
 
+## Coroutine 사용
+
+
+
+### 라이브러리 설정
+
+> 버전에 맞게 설정
+
+```xml
+dependencies {
+  ...
+  implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.3.0'
+  implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.3.0'
+}
+```
+
+
+
+### 간단한 예시
+
+```kotlin
+Log.d(TAG, "doing something in mainThread")		//1
+
+GlobalScope.launch{														//2 
+  delay(3000)
+  Log.d(TAG, "done something in Coroutine")		//3
+}
+
+Log.d(TAG, "done in mainThread")							//4
+```
+
+1. main thread에서 로그 출력
+2. launch{...} 코드 블록은 코루틴에서 작업을 수행하는 명령어이다. 괄호 안의 코드들이 비동기적으로 수행
+3. 코루틴에서 3초 쉬고, 로그를 출력
+4. 코루틴을 실행하고 메인 쓰레드에서 다시 로그 출력
+
+
+
+**실행결과**
+
+```kotlin
+10-26 19:52:42.975  7699  7699 D MainActivity: doing something in main thread
+10-26 19:52:42.985  7699  7699 D MainActivity: done in main thread
+10-26 19:52:45.992  7699  7727 D MainActivity: done something in Coroutine
+```
+
+메인 쓰레드의 로그가 모두 출력되고, 코루틴은 delay로 인해 나중에 로그가 출력
+
+코루틴은 비동기적으로 수행되기 때문에 메인쓰레드 코드들이 먼저 호출되었다.
+
+
+
+### launch, async
+
+> 코루틴을 실행하는 명령어
+
+`launch`, `async` 는  코루틴을 실행하는 명령어라는 공통점이 있지만 아래와 같은 차이점이 있다.
+
+- launch 는 리턴 값이 없다.
+- async 는 Deferred<T> 객체를 리턴한다.
+
+
+
+Deferred<T> 클래스는 `await()` 메소드를 제공한다.
+
+이 메소드는 작업이 완료되는 것을 기다리고 T 타입의 객체를 리턴한다.
+
+```kotlin
+//Deferred.kt
+public interface Deferred<out T> : Job {
+  public suspend fun await() : T
+  ...
+}
+```
+
+
+
+#### launch, async 사용 방법
+
+```kotlin
+GlobalScope.launch{																//1
+  launch {																				//2
+    Log.d(TAG, "Launch has No return value")
+  }
+  
+  val value = async {															//3
+    1 + 2																					//4
+  }.await()																				//5
+  
+  Log.d(TAG, "Async has return value : $value")
+}
+```
+
+1. GlobalScope.launch 는 코루틴을 실행
+2. GlobalScope.launch{...} 안에 launch{...}로 다른 코루틴을 실행
+3. async{...} 로 코루틴 실행
+4. "1 + 2" 연산 후 3을 리턴
+5. await() 는 async의 코루틴이 끝날 때까지 기다리고 결과를 리턴한다.
+
+
+
+**실행결과**
+
+```kotlin
+10-26 20:52:13.597  8158  8187 D MainActivity: Launch has NO return value
+10-26 20:52:13.599  8158  8186 D MainActivity: Async has return value: 3
+```
+
+
+
+### Suspend functions
+
+코루틴 안에서 일반적인 메소드는 호출 할 수 없다.
+
+코루틴의 코드는 잠시 실행을 멈추거나 (suspend) 다시 실행 될(resume) 수 있기 때문이다.
+
+코루틴에서 실행할 수 있는 메소드를 만드려면 함수를 정의 할 때 `suspend` 를 붙여 주면 된다.
+
+suspend 함수는 안에서 다른 코루틴을 실행 할 수도 있다.
+
+```kotlin
+GlobalScope.launch{
+  doSomething()
+  Log.d(TAG, "done something")
+}
+
+suspend fun doSomething(){
+  GlobalScope.launch{
+    sleep(1000)
+    Log.d(TAG, "do something in a suspend method")
+  }
+}
+```
+
+
+
+**실행 결과**
+
+```kotlin
+10-26 21:05:18.990  8418  8446 D MainActivity: done something
+10-26 21:05:19.990  8418  8447 D MainActivity: do something in a suspend method
+```
+
+
+
+### Thread
+
+코루틴은 여러 함수를 번갈아가면서 동작된다.
+
+코루틴이 실행되는 쓰레드를 지정할 수 있다.
+
+쓰레드를 지정해줘야 하는 이유는, 작업이 종류에 따라서 빠르게 처리되어야 하는 것이 있고, 안드로이드의 UI 작업은 Main thread에서만 수행되어야 하기 때문에 이런 경우 Main thread에서 코루틴이 실행되도록 해야 한다.
+
+
+
+`launch()` 에 인자로 쓰레드 타입을 넘겨주면, 코루틴은 그 쓰레드에서 실행된다.
+
+```kotlin
+GlobalScope.launch(Dispatchers.IO){
+  doOnIOthread()
+}
+```
+
+안드로이드는 3개의 Dispatchers를 제공한다.
+
+- Dispatchers.Main : 안드로이드의 메인 쓰레드, UI 작업은 여기서 처리
+- Dispatchers.IO : Disk 또는 네트워크에서 데이터 읽는 I/O 작업 처리, ex) 파일 읽기, AAC의 Room 등
+- Dispatchers.Default : 그 외 CPU에서 처리하는 대부분의 작업들은 이 쓰레드에서 처리
+
+
+
+예시
+
+```kotlin
+GlobalScope.launch(Dispathcers.Main){						// 1
+  val userOne = async(Dispathcers.IO){					// 2
+    fetchFirstUser()
+  }
+  val userTwo = async(Dispathcers.Default){			// 3
+    fetchSecondUser()
+  }
+  showUsers(userOne.await(), userTwo.await())		// 4
+}
+```
+
+1. 코루틴을 Main 쓰레드에서 실행
+2. 이 작업은 IO 쓰레드에서 수행
+3. 이 작업은 Default 쓰레드에서 수행
+4. 이 코드는 Main 쓰레드에서 실행되며, 2와 3 작업이 모두 끝날 때 까지 기다리고 결과를 출력
+
+
+
+`withContext()` 라는 메소드도 있다.
+
+이것은 `async` 와 동일한 역할을 하는 키워드이다.
+
+차이점은 `await()` 를 호출할 필요가 없다는 것이다.
+
+결과가 리턴될 때까지 기다린다.
+
+```kotlin
+suspend fun <T> withContext(
+	context : CoroutineContext,
+  block : suspend CoroutineScope.() -> T
+): T (source)
+```
+
+
+
+예시
+
+```kotlin
+GlobalScope.launch(Dispathcers.IO){						// 1
+  Log.d(TAG, "Do something on IO thread")			
+  val name = withContext(Dispathcers.Main){		// 2
+    sleep(2000)
+    "My name is Sleam Shady"
+  }
+  																						// 3
+  Log.d(TAG, "Result : $name")								// 4
+}
+```
+
+1. 이 코드는 IO 쓰레드에서 실행
+2. 이 코드는 Main 쓰레드에서 실행
+3. withContext() 다음 코드를 수행하지 않는다. await() 를 호출한 것 처럼 결과가 리턴되기를 기다린다.
+4. withContext() 의 코루틴이 모두 수행되면 이 코드가 수행된다.
+
+
+
+실행결과
+
+```kotlin
+10-26 22:44:16.488  9723  9752 D MainActivity: Do something on IO thread
+10-26 22:44:18.649  9723  9752 D MainActivity: Result : My name is Sleam Shady
+```
+
+
+
+### Scope
+
+Scope는 코루틴이 실행되는 범위이다.
+
+위의 예시는 모두 GlobalScope를 사용했는데, 이 스코프는 Application이 종료될 때 까지 코루틴을 실행시킬 수 있다.
+
+만약 Acitivity에서 코루틴을 GlobalScope 영역에서 실행시켰다면, Acitivity가 종료되도 코루틴은 작업이 끝날 때까지 동작한다.
+
+Acitivity 에서보여줄 이미지를 다운받고 있는데 Activity가 종료되었다면 그 작업은 불필요한 리소스를 낭비하고 있는 것이다.
+
+Acitivity가 종료될 때 실행 중인 코루틴도 함께 종료되길 원하다면 Acitivity의 Lifecycle과 일치하는 Scope에 코루틴을 실행시키면 된다.
+
+
+
+Activity scope는 없기 때문에 Activitiy의 Lifecycle과 일치하는 Scope를 만들어줘야 한다.
+
+```kotlin
+class MainActivity : AppCompatActivity(), CoroutineScope {		// 1
+    private lateinit var job: Job     												// 2
+    override val coroutineContext: CoroutineContext   				// 3
+        get() = Dispatchers.Main + job
+}
+```
+
+1. CoroutineScope 인터페이스 구현
+
+2. Job 객체 선언
+
+3. CoroutineScope 인터페이스의 CoroutineContext 변수를 오버라이드
+
+   Dispatcher.Main 에 위에서 생성한 Job을 더한다.
+
+
+
+```kotlin
+override fun onCreate(savedInstanceState : Bundle?){
+  super.onCreate(savedInstanceState)
+  job = Job()																					// 1
+  ....
+}
+
+override fun onDestroy(){
+  super.onDestroy()
+  job.cancel()																				// 2
+}
+```
+
+1. Job 객체 생성
+2. Activity가 종료될 때 수행 중인 Job이 있다면 취소
+
+
+
+이 Activitiy는 CoroutineScope를 구현했기 때문에 코루틴을 실행할 때 다음처럼 `launch{}` 키워드만 입력하면 된다.
+
+```kotlin
+launch {
+  Log.d(TAG, "do something")
+  ...
+}
+```
+
+위처럼 클래스 내에 객체를 생성해서 Scope를 만들 수 있다.
+
+
+
+다음은 ViewModel과 동일한 Lifecycle을 갖는 Scope를 생성하는 예제
+
+ViewModel 객체는 Activity가 완전히 소멸되면 함께 소멸된다.
+
+```kotlin
+class MyViewModel : ViewModel() {
+    private val job = Job()     																		// 1
+    private val uiScope = CoroutineScope(Dispatchers.Main + job)    // 2
+
+    fun doSomeOperation() {
+        uiScope.launch {    																				// 3
+            val deferred = async(Dispatchers.Default) {
+                10 + 10
+            }
+            Log.d(TAG, "await: ${deferred.await()}")
+        }
+    }
+
+    override fun onCleared() {    																	// 4
+        super.onCleared()
+        job.cancel()     																						// 5
+    }
+}
+```
+
+1. Job 객체 생성
+2. CoroutineScope 객체 생성
+3. 코루틴 실행 시 위에서 생성한 uiScope 사용하여 uiScope.launch{...}
+4. ViewModel 객체가 소멸될 때 onCleared() 메소드가 호출
+5. 실행 중인 코루틴이 있다면 Job을 취소
+
+
+
+### Exception handling
+
+코루틴 안에서 Exception 이 발생하면 앱이 갑자기 죽는다.
+
+예외 처리는 다음과 같이 할 수 있다.
+
+```kotlin
+GlobalScope.launch(Dispatchers.IO + handler){														// 1
+  launch {
+    throw Exception()																										// 2
+  }
+}
+
+val handler = CorutineExceptionHandler { coroutineScope, exception ->   // 3
+    Log.d(TAG, "$exception handled!")
+}
+```
+
+1. launch()의 인자에 플러스 연산자로 "handler"를 추가한다. 예외가 발생하면 이 handler로 콜백이 전달되어 예외처리
+2. 예외가 발생
+3. 예외 처리
+
+
+
+**결과**
+
+```kotlin
+10-26 22:54:16.756 10279 10306 D MainActivity: java.lang.Exception handled!
+```
+
+
+
+`async` 나 `withContext` 를 사용하는 경우 위의 방법으로 예외처리가 안된다.
+
+아래와 같이 try-catch 구문으로 예외처리를 해야 한다.
+
+```kotlin
+GlobalScope.launch(Dispatchers.IO){
+  try {
+    val name = withContext(Dispatchers.Main){
+      throw Exception()
+    }
+  } catch (e : Exception){
+    Log.d(TAG, "$e handled!")
+  }
+}
+```
+
+
+
+
+
+
+
 ---
 
 참고사이트
@@ -441,3 +832,18 @@ suspend goCompany(person : Person){
 Gisdeveloper 코루틴 예제 : http://www.gisdeveloper.co.kr/?p=10279
 
 티스토리 : https://whyprogrammer.tistory.com/596 
+
+
+
+Coroutines 101 한글번역 : https://seunghyun.in/android/7/#synchronous
+
+Coroutines 공식 가이드 한글번역 : https://myungpyo.medium.com/reading-coroutine-official-guide-thoroughly-part-1-98f6e792bd5b
+
+KotlinWorld : https://kotlinworld.com/155?category=973476
+
+
+
+사용
+
+코드차차 : https://codechacha.com/ko/android-coroutine/
+
