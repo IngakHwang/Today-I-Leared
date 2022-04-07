@@ -94,6 +94,8 @@ Bluetooth 관련 클래스(BluetoothAdapter.class)
 
 ObdDataProvider.kt
 
+Moshi.kt : 서버로 올리기 전에 문자열 변환을 위한 클래스
+
 
 
 reactivex.rxjava3

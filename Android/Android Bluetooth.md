@@ -231,3 +231,5 @@ val receiver = object : BroadcastReceiver(){
 참고 사이트
 
 티스토리 : https://doqtqu.tistory.com/166?category=858763
+
+공홈 : https://developer.android.com/guide/topics/connectivity/bluetooth#TheBasics
