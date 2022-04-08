@@ -24,6 +24,52 @@ Manifest.xml
 
 
 
+**Android.permission**
+
+---
+
+ACCESS_FINE_LOCATION : 앱이 정확한 위치에 액세스할 수 있도록 허용
+
+ACCESS_COARSE_LOCATION : 앱이 대략적인 위치에 액세스할 수 있도록 허용
+
+BLUETOOTH : 앱이 페어링된 블루투스 기기에 연결할 수 있도록 허용
+
+BLUETOOTH_ADMIN : 앱이 블루투스 기기를 검색하고 페어링 할 수 있도록 허용
+
+BLUETOOTH_ADVERTISE : 주변 블루투스 기기에게 광고 ("나 블루투스 기기 입니다~~")
+
+BLUETOOTH_CONNECT : 페어링된 블루투스 장치에 연결하는데 필요
+
+BLUETOOTH_PRIVILEGED : 앱이 사용자 상호 작용 없이 블루투스 장치를 페어링하고 전화번호부 접근, 또는 메시지 접근을 허용하거나 허용하지 않도록
+
+BLUETOOTH_SCAN : 근처에 있는 블루투스 장치를 검새갛고 페어링하는 데 필요
+
+참고 사이트 : 공홈 - https://developer.android.com/reference/android/Manifest.permission
+
+----
+
+
+
+**Android.hardware**
+
+----
+
+bluetooth : 앱이 일반적으로 다른 블루투스 사용 기기와 통신하기 위해 기기의 블루투스 기능을 사용
+
+bluetooth_le : 앱이 기기의 저전력 블루투스 무선 기능을 사용
+
+location : 앱이 일반적으로 다른 소비자용 적외선 기기와 통신하기 위해 기기의 적외선 기능을 사용
+
+location.gps : 앱이 기기에서 GPS 수신기가 제공하는 정확한 위치 좌표를 사용
+
+location.network : 앱이 기기에 지원되는 네트워크 기반 위치정보 시스템이 제공하는 대략적인 위치 좌표를 사용
+
+참고 사이트 : 공홈 - https://developer.android.com/guide/topics/manifest/uses-feature-element#features-reference
+
+----
+
+
+
 Permission check method
 
 ```kotlin
