@@ -1,5 +1,79 @@
 # Android Bluetooth
 
+> 스마트폰, 노트북, 이어폰, 헤드폰 등의 전자기기를 서로 연결하여 종보를 교환하는 근거리 무선 기술 (10M 이내)의 표준
+
+
+
+## 원리
+
+블루투스의 원리 = 무선전파의 원리
+
+안테나를 통해 보내고자 하는 데이터를 전자기파로 변조하여 보내고
+
+안테나가 수신하여 전자기파를 데이터로 복조 시키는 것
+
+(복조 : 데이터 통신에서 수신된 신호를 원래의 신호로 복구하는 조작)
+
+
+
+## Bluetooth와 BLE 차이
+
+BLE : Bluetooth Low Energy
+
+
+
+BLE는 개인용 무선 네트워크 (Wireless Personal Area Network, WPAN) 기술의 일종
+
+기존 블루투스 (Bluetooth Classic, BR/EDR)과는 사실상 별개의 기술
+
+
+
+차이점은 블루투스(BR/EDR + HS) 기술이 데이터 전송 속도 (data rate)에 초점을 맞추고 있는 반면,
+
+BLE은 전력 소모를 줄이는 것에 초점을 맞추며 헬스케어, 피트니스, 보안 시스템 등의 특정 응용분야에 적합한 기술로 대두
+
+​	저전력, 저비용, 단순성, 저속도, 소형 지향
+
+​	BLE 로만 동작하는 싱글 모드 (Bluetooth SMART)
+
+​	BLE + 블루투스 모두 지원하는 듀얼 모드 (Bluetooth SMART Ready)
+
+![img](http://www.ktword.co.kr/img_data/5403_1.JPG)
+
+![img](https://iotlab.tertiumcloud.com/wp-content/uploads/2020/08/Classic-Bluetooth-vs-BLE.png)
+
+---
+
+BR : Basic Rate
+
+EDR : Enhanced Date Rate
+
+HS : High Speed
+
+---
+
+### BLE 특징
+
+- 연결 중 수면 시간 (sleep time)
+
+- 작은 크기의 데이터 전송 단위
+
+- 매우 낮은 Duty Cycle
+
+- 주파수 대역 : 기존 블루투스와 동일 (2.4GHz)
+
+- 사용 채널 : 2 MHz 폭씩 40개 채널
+
+- 전력 소모 : 15 mA 이내
+
+- 전송 속도 : 1Mbps
+
+- 최대 전송 전력 : 10 mW
+
+- 통신 방향 : 양방향 모두 지원 가능 하지만, 대개 단방향성만 지원
+
+  
+
 
 
 ## Bluetooth Permission
@@ -279,3 +353,7 @@ val receiver = object : BroadcastReceiver(){
 티스토리 : https://doqtqu.tistory.com/166?category=858763
 
 공홈 : https://developer.android.com/guide/topics/connectivity/bluetooth#TheBasics
+
+정보통신기술용어해설(오래된 자료) : http://www.ktword.co.kr/test/view/view.php?no=5376
+
+외국사이트 : https://iotlab.tertiumcloud.com/2020/08/19/classic-bluetooth-vs-bluetooth-low-energy-ble/
