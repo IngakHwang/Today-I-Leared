@@ -76,6 +76,70 @@ HS : High Speed
 
 
 
+## Bluetooth Class
+
+- **BluetoothAdapter**
+
+  블루투스 송수신 장치를 나타낸다. 블루투스 상호작용에 대한 진입점이다.
+
+  이를 사용해서 다른 블루투스 기기를 검색하고 연결된(페어링된) 기기 목록을 쿼리하고 알려진 MAC 주소로 `BluetoothDevice` 를 인스턴스화하고, 다른 기기로 부터 통신을 수신 대기하는 `BluetoothServerSocket` 을 만들 수 있다.
+
+- **BluetoothDevice**
+
+  원격 블루투스 기기를 나타낸다.
+
+  이를 사용해서 `BluetoothSocket` 을 통해 원격 기기와의 연결을 요청하거나 이름, 주속, 클래스 및 연결 상태와 같은 기기 정보를 쿼리한다.
+
+- **BluetoothSocket**
+
+  블루투스 소켓에 대한 인터페이스
+
+  `InputStream`, `OutputStream` 을 통해 앱이 다른 블루투스 기기와 데이터를 교환할 수 있게 허용하는 연결 지점
+
+- **BluetoothServerSocket**
+
+  들어오는 요청을 수신 대기하는 OpenServerSocket
+
+  두 대의 Android 기기를 연결 시에 한 기기가 이 클래스를 사용하여 서버 소켓을 열어야 한다.
+
+  원격 블루투스 기기가 이 기기로 연결 요청을 보내면 해당 기기가 연결을 수락한 다음, 연결된 `BluetoothSocket` 을 반환
+
+- **BluetoothClass**
+
+  블루투스 기기의 일반적인 특징 및 기능에 대해 설명
+
+  기기 클래스와 서비스를 정의하는 읽기 전용 속성 집합이다.
+
+  이 정보는 기기의 유형에 관한 유용한 힌트를 제공한다.
+
+  다만 이 클래스의 특성만으로 기기가 지원하는 모든 블루투스 프로필과 서비스가 설명되는 것은 아님
+
+- **BluetoothProfile**
+
+  Bluetooth 프로필을 나타내는 인터페이스
+
+  Bluetooth 프로필은 기기 간 블루투스 기반 통신에 대한 무선 인터페이스 사양이다.
+
+  - BluetoothProfile.ServiceListener
+
+    특정 프로필을 실행하는 내부 서비스와 연결하거나 연결을 끊을 때 `BluetoothProfile` IPC 클라이언트에 알리는 인터페이스
+
+- **BluetoothGatt**
+
+  Bluetooth Smart 또는 Smart Ready 장치와 통신할 수 있도록 Bluetooth GATT 기능을 제공
+
+  주변 장치에 연결하려면 이 클래스의 인스턴스를 가져오기 위해 `BluetoothGattCallback` 호출하고 생성
+
+- **BluetoothGattServer**
+
+  Bluetooth GATT Server 역할 기능을 제공하여 응용 프로그램이 Bluetooth Smart 서비스 및 특성을 생성
+
+  BluetoothGattServer는 IPC를 통해 Bluetooth 서비스를 제어하기 위한 프록시 개체
+
+
+
+
+
 ## Bluetooth Permission
 
 Manifest.xml
