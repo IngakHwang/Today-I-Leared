@@ -1,5 +1,9 @@
 # Coroutines
 
+> 코루틴은 스레드 안에서 실행되는 일시 중단 가능한 작업의 단위이다. 
+>
+> 하나의 스레드에 여러 코루틴이 존재할 수 있다.
+
 
 
 코루틴은 코틀린만의 것이 아니다.
@@ -11,6 +15,150 @@
 그러나 구글이 안드로이드 공식 언어를 자바에서 코틀린으로 변경 이후 샘플 예제들인 bluprint, sunflower 앱의 비동기처리를 coroutine 으로 바꾸었다.
 
 코루틴을 사용하면 비동기 처리가 너무나도 쉽게 이루어질 수 있기 때문이다.
+
+
+
+## 왜 Coroutine이 필요할까?
+
+> 스레드 작업을 최적화
+>
+> Blocking 되는 상황이 줄어 Thread의 리소스를 최대한 활용할 수 있다.
+>
+> Thread는 만드는 비용이 큰데, Coroutine은 Thread를 만드는 대신 하나의 Thread 상에서 자신을 일시 중지할 수 있도록 하여 Thread 생성 비용을 줄인다.
+
+
+
+### 기존 JVM 프로세스
+
+하나의 프로세스에는 여러 스레드가 있고, 각 스레드는 독립적으로 작업을 수행할 수 있다.
+
+예를 들어 JVM 프로세스 상에서는 스레드는 아래 그림과 같이 구성된다.
+
+![image-20220411183639023](https://tva1.sinaimg.cn/large/e6c9d24egy1h15x273ytkj20s60to77j.jpg)
+
+JVM 프로세스는 Main Thread가 종료되면 강제로 종료되며, JVM 프로세스에 속상 Thread들도 함께 강제로 종료된다.
+
+하지만 Main Thread 말고 다른 2개의 Thread 들은 Main Thread와 마찬가지로 작업을 수행할 수 있지만, 이 Thread들은 종료되더라도 다른 Thread에 영향을 미치지 않는다.
+
+
+
+안드로이드에서 Main Thread는 가장 중요한 UI Thread 역할로 UI를 그려주고 사용자가 화면터치 이벤트를 전달받는 스레드이다. 사용자와 인터렉션을 담당하는 Thread이다.
+
+만약 이 Thread가 높은 부하를 받는 작업에 의해 블로킹된다면 안드로이드 앱은 멈춤 현상이 일어나고, 일정 시간 이상 블로킹 될 때 앱은 강제로 종료된다.
+
+따라서 Main Thread에서 많은 부하를 받는 작업은 지양해야 하며, 다른 Thread를 생성해 해당 Thread에 높은 부하를 주는 작업을 수행하도록 만들어야 한다.
+
+
+
+### 기존 접근 방식과 한계점
+
+위의 문제를 해결하기 위해서 여러가지 방법이 시도 되었다.
+
+1. Runnable 인터페이스를 구현하는 클래스를 만든 다음 Thread에 해당 클래스를 넣어 start
+
+   ```kotlin
+   fun main(){
+     Thread(ExampleRunnable()).start()
+     Thread(ExampleRunnable()).start()
+   }
+   
+   class ExampleRunnable : Runnable{
+     override fun run(){// code }
+       
+     
+   }
+   ```
+
+2. ExecuterService를 이용해 Thread pool 구성하여 작업 진행
+
+   ```kotlin
+   fun main(){
+     val executerService = Executors.newFixedThreadPool(4)
+     
+     executerService.submit(ExampleRunnable())
+     executerService.submit(ExampleRunnable())
+   }
+   
+   class ExampleRunnable : Runnable{
+     override fun run(){// code }
+   ```
+
+3. Rx 라이브러리를 이용하는 방식
+
+   ```kotlin
+   publisher.subscribeOn(Schedulers.io())
+   				.observeOn(AndroidSchedulers.mainThread())
+   ```
+
+   Rx 라이브러리는 Reactive Programming을 돕기 위한 라이브러리이다.
+
+   데이터를 발행하는 Thread와 데이터를 구독하는 Thread를 손쉽게 제어할 수 있게 함으로써 스레드 작업을 쉽게 하기 위해 도운다.
+
+
+
+위와 같은 기존 접근 방식들의 한계점은 작업의 단위가 Thread 라는 점이다.
+
+다른 Thread로 작업을 넘기면 된다고 했는데 작업의 단위가 Thread인 것이 무슨 말이고, 무슨 문제일까?
+
+
+
+Thread는 생성 비용이 비싸고 작업을 전환하는 비용이 비싸다.
+
+또한 한 Thread가 다른 Thread 부터의 작업을 기다려야 할 때 Blocking 되게 되면 해당 Thread는 하는 작업 없이 다른 작업이 끝마쳐질 때 까지 기다려야 하기 때문에 자원은 낭비된다.
+
+위의 작업 단위가 Thread일 경우 생기는 고질적인 문제점이다.
+
+
+
+![image-20220411185038689](https://tva1.sinaimg.cn/large/e6c9d24egy1h15xgrfdavj21ho0i275o.jpg)
+
+
+
+위 그림을 보면 Thread1에서 작업1 수행 도중 Thread2의 작업2의 결과물이 작업1을 수행하는 데 필요하다.
+
+그 때 Thread1은 아무것도 하는 일 없이 Blocking 되면 Thread2로 부터 결과를 전달받아 작업1을 재개하기 까지 많은 시간이 소요된다.
+
+이렇게 짧은 시간동안만 Blocking되면 다행이지만, 실제 상황에서는 Thread의 성능을 반도 발휘하지 못하게 만드는 Blocking이 반복될 수 있다.
+
+
+
+### Coroutine이 기존 한계점을 극복하는 법
+
+코루틴에서도 Thread 라는 작업의 단위를 사용하지만, Thread 내부에서 작은 Thread처럼 동작하는 코루틴이 존재한다.
+
+Thread 하나를 일시중단 가능한 다중 경량 Thread 처럼 활용하는 것이 바로 Coroutine 이다.
+
+![image-20220411185534036](https://tva1.sinaimg.cn/large/e6c9d24egy1h15xlv2hroj20e40iewez.jpg)
+
+경량 Thread가 무엇일까? 일시 중단 가능한 것이 무엇일까?
+
+![image-20220411185612065](https://tva1.sinaimg.cn/large/e6c9d24egy1h15xmj80xuj21ha0iq766.jpg)
+
+1. Thread1 에서 Coroutine2개를 생성한다.
+
+   Thread1의 Coroutine1 에서는 작업1을 그대로 수행하게 만들고
+
+   Thread2에서는 작업2를 수행하게 만든다.
+
+   이 때 마찬가지로 Thread1의 Coroutine1에서 작업1 수행 도중 Thread2로 부터 결과가 필요해진다.
+
+   하지만 Thread2의 작업2가 끝나지 않아 작업1을 마저 할 수 없다.
+
+2. 이 때 Coroutine1은 Thread1을 Blocking 하는 대신 자신의 작업을 일시중단하고 Coroutine2에 Thread1 리소스 사용 권한을 남겨준다.
+
+   Thread1의 Coroutine2가 작업3을 위해 Thread1을 사용한다.
+
+3. 이 후 Thread2의 작업이 종료되고, 작업3을 수행하던 Coroutine2이 자신의 작업을 마무리하고 Coroutine2 자신을 일시중단 시킨다.
+
+   다시 Thread1의 제어권한이 Coroutine1로 돌아오고, Thread1은 Coroutine1이 마저 작업을 수행할 수 있도록 Thread2로 부터 결과를 전달받아 작업1을 재개한다.
+
+
+
+**Blocking 되는 상황이 줄어 Thread의 리소스를 최대한 활용할 수 있다.**
+
+**Thread는 만드는 비용이 큰데, Coroutine은 Thread를 만드는 대신 하나의 Thread 상에서 자신을 일시 중지할 수 있도록 하여 Thread 생성 비용을 줄인다.**
+
+
 
 
 
