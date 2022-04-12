@@ -582,6 +582,402 @@ suspend goCompany(person : Person){
 
 
 
+### Dispatcher
+
+> 코루틴을 만든 다음 해당 코루틴을 Dispatcher에 전송하면 Dispatcher는 자신이 관리하는 스레드풀 내의 스레드 부하 상황에 맞춰 코루틴을 배분
+
+코루틴을 시작 시 Dispatcher란 단어가 가장 먼저 접하게 된다.
+
+Dispatch 란 '보내다' 라는 뜻, Dispatcher는 무엇을 보내는 것인가?
+
+바로 스레드(Thread)에 코루틴(Coroutines)을 보낸다.
+
+코루틴에서는 스레드 풀을 만들고 Dispatcher를 통해서 코루틴을 배분한다.
+
+즉, 코루틴을 만든 다음 해당 코루틴을 Dispatcher에 전송하면 Dispatcher는 자신이 관리하는 스레드풀 내의 스레드 부하 상황에 맞춰 코루틴을 배분한다.
+
+
+
+**시작적으로 표현**
+
+1. 유저가 코루틴을 생성한 후 Dispatcher에 전송한다.
+
+   ![image-20220411212526743](https://tva1.sinaimg.cn/large/e6c9d24egy1h161xwi8pmj21eh0u040j.jpg)
+
+
+
+
+
+2. Dispatcher는 자신이 잡고 있는 Thread Pool 에서 자원이 남는 스레드가 어떤 스레드인지 확인한 후, 해당 스레드에 코루틴을 전송
+
+   <img src="https://tva1.sinaimg.cn/large/e6c9d24egy1h161zpmzeyj215m0u0wgk.jpg" alt="image-20220411212714933" style="zoom:40%;" />
+
+3. 분배 받은 Thread는 해당 코루틴을 수행한다.
+
+   <img src="https://tva1.sinaimg.cn/large/e6c9d24egy1h1621drtuqj20i20wwabf.jpg" alt="image-20220411212852015" style="zoom:40%;" />
+
+#### 코루틴 스레드 풀
+
+코루틴에서 스레드 풀을 만들기는 쉽다.
+
+단순히 다음과 같은 코드를 수행하는 것만으로 스레드가 3개인 Dispatcher를 생성하는 것이 가능하다.
+
+```kotlin
+val dispatcher = newFixedThreadPoolContext(3, "ThreadPool")		// 스레드 3개인 Dispatcher
+val singleDispatcher = newSingleThreadContext("SinglThreade")	// 스레드 1개인 Dispatcher
+```
+
+
+
+코루틴은 스레드 풀을 만들지만 직접 스레드 풀을 제어하지 않는다.
+
+위 그림에서 볼 수 있듯이, 코루틴은 만들어진 스레드 풀을 직접 제어하지 않고 Dispatcher를 통해 제어한다.
+
+즉, 스레드 풀을 직접 만들 수 있지만, 해당 스레드 풀 제어는 모두 Dispatcher에게 맡긴다.
+
+개발자가 Dispatcher에게 코루틴을 보내기만 하면, Dispatcher는 스레드에 코루틴을 분산시킨다.
+
+
+
+#### 안드로이드 Dispatcher
+
+안드로이드에는 이미 Dispatcher가 생성되어 있어 별도로 생성하거나 정의할 필요가 없다.
+
+
+
+**기본으로 생성되어 있는 Dispatcher**
+
+- Dispatchers.Main - Android 메인 스레드에서 코루틴을 실행하는 디스패처, **UI와 상호작용하는 작업을 실행하기 위해서만 사용**
+- Dispatchers.IO - **디스크 또는 네트워크 I/O 작업을 실행하는 데 최적화**되어 있는 디스패처
+- Dispatchers.Default - **CPU를 많이 사용하는 작업을 기본 스레드 외부에서 실행하도록 최적화**되어 있는 디스패처, **정렬 작업이나 JSON 파싱 작업 등에 최적화**
+
+
+
+### launch, async
+
+> 결과 반환이 필요 없을 때 launch, 필요할 때 async
+>
+> 코루틴을 생성할 때 Dispatcher를 설정하는 것만으로 Dispatcher의 전환이 가능하다.
+
+
+
+Dispathcer에 Coroutine을 붙이는 작업은 `launch{}` , `async{}` 두가지 메서드를 통해 가능하다.
+
+결과 반환이 없는 단순 작업에는 launch
+
+결과 반환이 있는 작업에는 async를 사용
+
+|        | 결과 반환 | 반환타입   |
+| ------ | --------- | ---------- |
+| launch | X         | Job        |
+| async  | O         | Defered<T> |
+
+
+
+#### launch : 결과 반환X
+
+launch는 결과를 반환하지 않고 launch 수행 시 Job이 반환된다.
+
+```kotlin
+with(CoroutineScope(Dispatchers.Main)){
+  val job : Job = launch {println(1)}
+}
+```
+
+
+
+#### async : 결과 반환O
+
+async는 결과를 반환하며 결과값은 Deferred로 감싸서 반환된다.
+
+Deffered는 미래에 올 수 있는 값을 담아놓을 수 있는 객체이다.
+
+```kotlin
+CoroutineScope(Dispatchers.Main).launch{
+  val defferdInt : Defferd<Int> = async{
+    printlnt(1)
+    1							//마지막 줄 반환
+  }
+  val value = defferdInt.await()
+  println(value)	// 1 출력
+}
+```
+
+Async 블록의 마지막 줄에 있는 1이 반환되어야 하므로 `Defferred<Int>` 값이 반환되었다.
+
+
+
+Deferred<T> 의 `await()` 메서드가 수행되면 코루틴은 결과가 반환되기 까지 기다린다.
+
+이를 코루틴이 일시 중단 되었다고 한다.
+
+이러한 특성으로 인해 **`await()` 메서드는 일시 중단이 가능한 코루틴 내부에서만 사용이 가능하다.**
+
+만약 바깥에서 `await()` 를 사용하면 `fun` 키워드를 `suspend fun` (일시중단 함수) 로 만들라는 오류가 생긴다.
+
+<img src="https://tva1.sinaimg.cn/large/e6c9d24egy1h162s444szj21780qe433.jpg" alt="image-20220411215432889" style="zoom:40%;" />
+
+
+
+위에서 두가지 방식을 통해 디스패처에 코루틴을 붙이는 기본적인 방법을 설명했다.
+
+아래에서는 Dispatcher를 전환하면서 코루틴을 붙이도록하여 각 코루틴의 작업 성격에 맞게 Dispatcher를 설정하는 방법
+
+
+
+#### Dispatcher 전환하면서 Coroutine 붙이기
+
+파일 시스템으로부터 `Array<Int>` 를 받아와서 정렬한 다음 TextView에 출력하는 과정을 한다고 가정
+
+이 과정에는 **파일 입출력 (Dispatchers.IO), Array 정렬 (Dispatchers.Default), TextView 출력 (Dispatchers.Main)과 같이 여러 Dispatcher에 맞는 작업이 들어가는 데 코루틴은 이러한 Dispatcher Switching을 하기 위한 간편한 방법을 제공**
+
+
+
+```kotlin
+// 1. Main Dispatcher를 기본으로 설정
+CoroutineScope(Dispatchers.Main).launch{
+  
+  // 2. Data I/O 을 위한 IO Dispatcher에 배분
+  val defferdInt : Deferred<Array<int>> = async(Dispatchers.IO){
+    println(1)
+    arrayOf(3, 1, 2, 4, 5)			// 마지막 줄 반환
+  }
+  
+  // 3. Sort 해야 하므로 CPU 작업을 많이 해야하는 Default Dispatcher에 배분
+  val sortedDefferd = async(Dispatchers.Default){
+    val value = defferdInt.await()
+    values.sortedBy{it}
+  }
+  
+  // 4. 기본인 Main Dispatcher
+  // TextView에 세팅하는 것은 UI 작업 = Main Dispatcher에 배분
+  val textViewSettingJob = launch {
+    val sortedArray = sortedDeferred.await()
+    setTextView(sortedArray)
+  }
+}
+```
+
+
+
+1. 기본적으로 Main Dispatcher 안에서 시작되도록 `CoroutineScope(Dispatchers.Main).launch` 가 수행
+
+2. 파일 시스템으로부터 [3, 1, 2, 4, 5] Array를 가져오는 작업은 결과를 반환 받아야 하는 작업이다.
+
+   따라서 async를 사용하고, 이 때 **파일 I/O 이므로 전용 디스패처인 Dispathcers.IO 사용**
+
+   아래와 같이 async 뒤에 Dispatchers.IO 를 붙임으로써 dispatcher 스위칭이 가능해진다.
+
+   ```kotlin
+   async(Dispathcers.IO){//데이터 입출력을 해야 하므로 IO Dispatcher에 배분
+   	..
+   }
+   ```
+
+3. **Sorting은 CPU작업을 많이 사용하므로 Dispatchers.Default에서 수행**
+
+   결과를 반환받을 수 있도록 async를 사용하며 이 때 내부에서 파일 입출력이 끝나기 까지 수행을 일시정지하기 위해 `deferredInt.await()` 를 사용
+
+   ```kotlin
+   async(Dispatchers.Default){
+     val value = deferredInt.await()		// 결과값이 오기를 기다림
+   }
+   ```
+
+4. TextView에 결과값을 세팅하는 작업
+
+   **이 작업은 UI 작업이므로 Dispatchers.Main에서 수행**
+
+   1번 과정에서 세팅한 Dispatchers.Main이 기본 Dispatcher 이므로 Dispatcher 세팅 없이 `launch{}` 만 수행
+
+   Sorting된 값이 올 때까지 기다려야 하므로 `sortedDeferred.await()` 를 수행하며, 해당 값이 왔을 때 SetText
+
+   ```kotlin
+   launch{																			//기본 디스패처 = Dispatchers.Main
+     val sortedArray = sortedDeferred.await()	// 결과값이 오기까지 대기
+     setTextView(sortedArray)									// SetText
+   }
+   ```
+
+
+
+
+### suspend fun
+
+> 코루틴 블록 내부에서 코루틴 일시 중단
+>
+> 코루틴 일시 중단은 코루틴 내부에서만 수행
+>
+> `suspend fun` 은 일시 중단 가능한 함수, 해당 함수 내에 일시 중단이 가능한 작업이 있다는 것을 뜻
+
+코루틴은 기본적으로 일시중단 가능하다.
+
+launch로 실행하든, async로 실행하든 내부에 해당 코루틴을 일시중단 해야하는 동작이 있으면 코루틴은 일시 중단된다.
+
+![image-20220412090425802](https://tva1.sinaimg.cn/large/e6c9d24egy1h16m54fvngj21gw0hm0v1.jpg)
+
+위 그림을 코드로 표현
+
+```kotlin
+fun exampleSuspend() {
+  // 2. IO Thread에서 작업3 수행
+  val job3 = CoroutineScope(Dispatchers.IO).async{
+ 
+    // 5. 작업3 완료
+    (1..10000).sortedByDescending{ it }
+  }
+  
+  // 1. Main Thread에서 작업1 수행
+  val job1 = CoroutineScope(Dispatchers.Main).launch{
+    println(1)
+    
+    // 3. 작업1의 남은 작업을 위하 작업3의 결과값이 필요하기 때문에 Main Thread는 작업1을 일시중단
+    val job3Result = job3.await()
+    // 6. 작업3 결과 전달
+    
+    // 7. 작업1 재개
+    job3Result.forEach{
+      println(it)
+    }
+  }
+  
+  // 4. MainThread에서 작업2 수행 및 완료
+  val job2 = CouroutineScope(Dispatchers.Main).launch{
+    println("Job2 수행")
+  }
+}
+```
+
+1. Main Thread의 Coroutine1에서 작업1(job1)이 수행되고, Main Thread의 자원을 점유
+2. IO Thread의 Coroutine3에서 작업3(job3)이 수행되고, IO Thread의 자원 점유
+3. Coroutine1에서 Coroutine3 - 작업3의 결과가 필요, 이 때 Coroutine1은 일시중단
+4. Coroutine2가 Main Thread 점유하여 작업2를 수행하고 완료
+5. Coroutine3의 작업3 완료
+6. Coroutine1은 작업3의 결과를 전달 받음
+7. Coroutine1 재개
+
+**결과**
+
+```kotlin
+I/System.out : 1 								 //Coroutine1 작업
+I/System.out : Job2 수행					//Coroutine2 작업
+I/System.out : 10000						 //Coroutine1 작업 재개
+	9999
+	9998
+	9997
+	..
+```
+
+
+
+작업3 (job3)은 IO Thread 위에서 수행되는 async 작업이며 결과값을 반환받는 작업이다.
+
+1 ~ 10000까지 내림차순으로 정렬해서 반환받는 작업이다보니 작업1 (job1)의 println(1) 보다는 많은 시간을 소모할 수 밖에 없다.
+
+
+
+이 때문에 job1 코루틴은 job3의 결과를 기다려야만 한다.
+
+따라서 중간에 일시 중단 하는 단계가 필요하다. 비동기 작업을 하다보면 이러한 상황을 맞딱뜨리는 경우가 많은데, 이 때 코루틴에서는 해당 코루틴 작업을 잠시 일시 중단 가능하도록 한다.
+
+이 때문에 일시 중단 가능한 함수는 코투린 내부에서 수행되어야 한다.
+
+
+
+**코루틴 일시 중단은 코루틴 블록 내부에서 수행되어야 한다.**
+
+일시 중단을 코루틴 블록 (launch, async) 내부에서 수행하지 않으면 일시 중단 함수로 바꾸라는 오류가 생긴다.
+
+**코루틴이 일시중단이 되려면 수행되는 위치도 코루틴 내부여야 하기 떄문이다.**
+
+이를 해결하는 방법은 두 가지로
+
+1. 일시 중단 작업을 코루틴 내부로 옮기는 것이거나
+2. 다른 하나는 `fun` 을 `suspend fun` (일시중단 가능 함수)로 만드는 것이다.
+
+
+
+**일시 중단 작업을 코루틴 내부로 옮기기**
+
+```kotlin
+fun exampleSuspend(){
+  val job3 = CoroutineScope(Dispatchers.IO).async{
+    (1..10000).sortedByDescending {it}
+  }
+  
+  CoroutineScope(Dispathcers.Main).launch{
+    job3.await()
+  }
+}
+```
+
+
+
+**일시 중단 작업을 수행하는 fun을 suspend fun으로 만들기**
+
+suspend fun 을 외부에서 별도 처리 없이 수행하면 오류가 생긴다.
+
+```kotlin
+class MainActivity : AppCompatActivity(){
+  override fun onCreate(savedInstanceState : Bundle?){
+    super.onCreate(savedInstancesState)
+    setContentView(R.layout.activity_main)
+    
+    exampleSuspend()		//에러
+  }
+}
+
+suspend fun exampleSuspend(){
+  val jo3 = CoroutineScope(Dispatchers.IO).async{
+    (1..10000).sortedByDescending { it }
+  }
+  
+  job3.await()
+}
+```
+
+이유는 **suspend fun은 일시중단 가능한 함수를 지칭하는 것이기 때문에, 해당 함수는 무조건 코루틴 내부에서 수행되어야 하기 때문**이다.
+
+```kotlin
+class MainActivity : AppCompatActivity(){
+  override fun onCreate(savedInstanceState : Bundle?){
+    super.onCreate(savedInstancesState)
+    setContentView(R.layout.activity_main)
+    
+    CoroutineScope(Dispatchers.Main).launch{
+      exampleSuspend()
+    }
+  }
+}
+
+suspend fun exampleSuspend(){
+  val jo3 = CoroutineScope(Dispatchers.IO).async{
+    (1..10000).sortedByDescending { it }
+  }
+  
+  job3.await()
+}
+```
+
+* suspend fun은 suspend fun 내부에서 수행될 수 있다.
+
+```kotlin
+suspend fun exampleSuspend2(){
+  exampleSuspend1()
+}
+
+suspend fun exampleSuspend1(){
+  val job3 = CoroutineScope(dispatchers.IO).async{
+    (1..10000).sortedByDescending { it }
+  }
+  job3.await()
+}
+```
+
+
+
+
+
 ## Coroutine 사용
 
 
@@ -590,13 +986,19 @@ suspend goCompany(person : Person){
 
 > 버전에 맞게 설정
 
+coroutine-core, coroutine-android 두 개의 라이브러리를 앱 수준의 gradle에 세팅하면 안드로이드에서 코루틴을 사용하기 위한 기본적인 세팅이 완료
+
 ```xml
 dependencies {
   ...
-  implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.3.0'
-  implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.3.0'
+  implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.5.0'
+  implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.5.0'
 }
 ```
+
+coroutines-core 라이브러리는 코루틴을 사용하기 위한 공통적인 라이브러리이다.
+
+Coroutines-android 라이브러리가 필요한 이유는 안드로이드는 스레드를 일반적인 JVM 어플리케이션과 다르게 사용하기 때문이다. 또한 안드로이드 어플리케이션은 Main Thread 에서 충돌이 일어나게 되면 강제로 종료되는 데 이러한 강제 종료가 일어나기 전 예외를 처리하기 위해 별도의 android용 coroutines 라이브러리인 coroutines-android가 필요
 
 
 

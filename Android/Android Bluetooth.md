@@ -346,7 +346,16 @@ ATT에 의해 부여된 속성은 특성 (characteristic)과 서비스(Service)�
 
   BluetoothGattServer는 IPC를 통해 Bluetooth 서비스를 제어하기 위한 프록시 개체
 
+- **BluetoothGattCallback**
 
+  추상 클래스로 BluetoothGattCallback 구현
+
+  - onCharacteristicChanged : 원격 characteristic 알림 결과 트리거된 콜백
+  - onCharacteristicRead : characteristic 읽기 작업의 결과를 보고하는 콜백
+  - onCharacteristicWrite : characteristic 쓰기 작업의 결과를 나타내는 콜백
+  - onConnectionStateChange : GATT 클라이언트가 원격 GATT 서버에 연결/해제 되었을 때를 나타내는 콜백
+  - onServiceChanged : Service 변경 이벤트가 수신되었음을 나타내는 콜백, 이 이벤트를 수신한다는 것은 GATT 데이터베이스가 원격 장치와 동기화되지 않았음을 의미
+  - onServicesDiscovered : 원격장치에 대한 원격 service, characteristic 및 descriptor의 목록이 업데이트 되었을 때, 즉 새로운 서비스가 발견되었을 때 호출되는 콜백
 
 
 
