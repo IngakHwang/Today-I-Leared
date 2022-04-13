@@ -976,6 +976,408 @@ suspend fun exampleSuspend1(){
 
 
 
+### Job Lazy
+
+**코루틴 빌더인 launch 메서드를 사용했을 때 Job이 생성이 된다.**
+
+Job은 결과가 없는 비동기 작업으로 예외가 발생하지 않는 이상 끝까지 수행되었었다.
+
+Job 비동기 작업을 실행하는 시점과, 실행 방법을 조절하는 것
+
+
+
+#### Job 생성
+
+**코루틴 빌더인 launch 메서드를 별도의 옵션 없이 사용하면 생성된 비동기 작업(Job)은 생성 후에 바로 실행**
+
+```kotlin
+val job = CoroutineScope(Dispatchers.Main).launch{
+  println(1)					// 1
+}
+```
+
+**위와 같이 Job을 생성할 경우 이 Job은 생성과 동시에 실행된다.**
+
+이러한 방식으로 Job을 생성하면 필요한 위치에 바로 생성해서 실행시켜야 하기 때문에 코루틴 실행의 유연성이 떨어질 수 밖에 없다.
+
+**이를 해결하기 위해 Job을 생성한 후 필요할 때 수행하도록 하는 옵션이 있다.**
+
+
+
+#### Job을 Lazy 실행
+
+Job을 생성 후 바로 실행되는 것을 막기 위해서는 아래와 같이 Job을 생성하는 launch 메서드에 `CoroutineStart.LAZY` 인자를 넘겨야 한다.
+
+```kotlin
+val job = CoroutineScope(Dispatchers.Main).launch(start = CoroutineStart.LAZY){
+  println(1)					// 아무 출력 없음
+}
+```
+
+위와 같이 Job이 생성되면 해당 Job은 수행되지 않고 대기 상태로 있는다.
+
+이것을 Job이 Lazy 하게 실행 된다고 한다.
+
+
+
+#### Lazy하게 생성된 Job 실행 방법 : `Start()` ,`join()`
+
+>  `start()` : 일시 중단 없이 실행되는 메서드
+>
+> `join()` : 일시 중단이 있는 실행 메서드
+
+ **`start()` 는 생성된 코루틴 작업을 일시 중단 없이 실행한다.**
+
+따라서 실행되는 위치를 코루틴 내부나 `suspend fun` 내부로 바꾸는 것이 필요하지 않다.
+
+```kotlin
+suspend fun main(){
+  val job = CoroutineScope(Dispatchers.IO).launch(start = CoroutineStart.LAZY){
+    println("가나다")
+  }
+  
+  job.start()
+}
+```
+
+위 코드 실행 시 아무 것도 출력되지 않는다.
+
+IO Thread는 Main Thread가 종료되면 같이 종료되기 때문이다.
+
+
+
+이를 출력되도록 하기 위해선
+
+IO Thread에서 코루틴이 실행 완료되는 동안 메인 스레드에서 일시 중단이 일어나도록 한다.
+
+```kotlin
+suspend fun main(){
+  val job = CoroutineScope(Dispatchers.IO).launch(start = CoroutineStart.LAZY){
+    println("가나다")
+  }
+  
+  job.start()
+  delay(100L)
+}
+```
+
+이러한 방식은 유용하지 않다.
+
+이러한 작업이 끝날 때까지 일시중단을 해주는 메서드 인 `join()` 메서드를 사용한다.
+
+
+
+**`join()` 은 Job이 종료될 때까지 Job이 실행되고 있는 코루틴을 일시중단 해준다.**
+
+```kotlin
+suspend fun main(){
+  val job = CoroutineScope(Dispatchers.IO).launch(start = CoroutineStart.LAZY){
+    println("가나다")
+  }
+  
+  job.join()
+}
+```
+
+위에서 `job.start()` 를 했을 때는 아무것도 출력되지 않지만, join을 사용하면 바로 출력 된다.
+
+이유는 Main Thread가 IO Thread의 Coroutine이 끝날 때까지 일시중단한 다음 다시 진행되기 때문이다.
+
+
+
+따라서 `join()` 은 일시중단이 가능한 코루틴 내부나, `suspend fun` 내부에서 사용되어야 한다.
+
+
+
+### Job 상태관리
+
+Job의 상태는 생성, 실행 중, 실행 완료, 취소 중, 취소 완료 총 5가지이다.
+
+![image-20220413171131392](https://tva1.sinaimg.cn/large/e6c9d24egy1h185ua1ihhj20zk08kdgg.jpg)
+
+- 생성(New) : Job 생성
+- 실행 중(Activie) : Job 실행 중
+- 실행 완료(Completed) : Job 실행 완료
+- 취소 중(Cancelling) : Job이 취소되는 중, Job이 취소되면 리소스 반환 등의 작업을 해야 하기 때문
+- 취소 완료(Cancelled) : Job 취소 완료
+
+
+
+앞의 글에서 launch를 통한 Job의 생성 및 실행을 다루고, launch에 CoroutineStart.LAZY 옵션을 추가해서 Job을 바로 실행되지 않게 만들고, LAZY job을 start(), join() 으로 시작할 수 있다고 했다.
+
+
+
+위 과정을 거쳐 생성 및 실행된 Job은 일반적으로 작업이 끝나면 실행완료 상태가 된 다음 종료된다.
+
+
+
+#### 실행 완료 안될 시
+
+**Job은 항상 실행에 성공하여 실행완료상태가 되지는 않는다.**
+
+다양한 변수로 인해 중간에 취소되어야 할 수 있다.
+
+예를 들어,
+
+네트워크를 통해 유저의 정보를 달라는 요청을 했을 때, 우리는 요청의 결과를 기다려야 한다.
+
+서버에서 요청이 성공, 거부 되었다는 메시지를 보내주면 Job은 실행에 성공하여 종료된다.
+
+하지만 만약 서버에서 결과를 주지 않는다면 우리는 계쏙해서 응답을 기다리고 있어야 한다.
+
+
+
+**이러한 상황에서 일정 시간 이후에 Job을 취소하는 작업이 필요하다.**
+
+**또한 Job을 취소했을 때 생기는 Exception에 대한 Handling이 필요하다.**
+
+
+
+#### Job을 취소
+
+**`cancel()` 을 이용한 Job의 취소**
+
+```kotlin
+suspend fun main(){
+  val job = CoroutineScope(Dispatchers.IO).launch{
+    delay(1000)
+  }
+  
+  job.cancel()
+  
+  delay(3000)
+}
+```
+
+`cancel()` 을 이용해 job을 취소할 수 있다.
+
+그냥 취소를 해주면 원인을 알 수 없으니 취소가 된 원인을 인자로 넣으면 좋다.
+
+
+
+**`cancel()` 에 cancel된 원인 넣고 출력**
+
+`cancel()` 에 두 가지 인자 `message : String` , `cause : Throwable` 을 넘기는 것으로 취소 원인을 알 수 있다.
+
+또한 Job에 `getCancellationException()` 메서드를 사용함으로 취소의 원인을 알 수 있다.
+
+```kotlin
+suspend fun main(){
+  val job = CoroutineScope(Dispatchers.IO).launch{
+    delay(1000)
+  }
+  
+  job.cancel("Job Cancelled by User", InterruptedException("Cancelled Forcibly"))
+  
+  println(job.getCancellationException()) 
+  // java.util.concurrent.CancellationException : Job Cancelled by User
+  
+  delay(3000)
+}
+```
+
+**Cancel 시 넘겨지는 Exception의 종류는 CancellationException으로 고정된다.**
+
+위에서는 InterruptedException 을 넘겼지만, 출력되는 것은 CancellationException이다.
+
+
+
+**cancel 되었을 때 동작 Handling**
+
+cancel된 원인을 Handling 하는 것은 **Job이 취소 완료 될 때 `invokeOnCompletion` 내의 메서드가 호출이 되는 데 이를 활용하여 핸들링한다.**
+
+```kotlin
+suspend fun main(){
+  val job = CoroutineScope(Dispatchers.IO).launch{
+    delay(1000)
+  }
+  
+  job.invokeOnCompletion { throwable ->
+    println(throwable)
+  }
+  
+  job.cancel("Job Cancelled by User", InterruptedException("Cancelled Forcibly"))
+  
+  delay(3000)
+}
+```
+
+위 코드에서 `job.invokeOnCompletion` 에서 throwable을 받고 해당 throwable을 출력할 수 있다.
+
+
+
+**문제는 invokeOnCompletion은 Job이 취소 완료 되었을 때 뿐 아니라, 실행 완료 되었을 때도 실행된다.**
+
+취소 없이 실행이 완료되면 throwable에 null이 나온다.
+
+```kotlin
+suspend fun main(){
+  val job = CoroutineScope(Dispatchers.IO).launch{
+    delay(1000)
+  }
+  
+  job.invokeOnCompletion { throwable ->
+    when(throwable){
+      is CancellationException -> prinlnt("Cancelled")
+      null -> println("Completed")
+    }
+  }
+  
+  job.cancel("Job Cancelled by User", InterruptedException("Cancelled Forcibly"))
+  
+  delay(3000)
+}
+```
+
+handling을 잘 해주어야 한다.
+
+
+
+### Job 상태변수
+
+Job의 상태 변수는 3가지가 있다.
+
+`job.isActive` , `job.isCancelled` ,`job.isCompleted` 
+
+- isActivie : Job 실행 중인지 여부 표시
+- isCancelled : Job cancel 요청되었는 지 여부 표시
+- isCompleted : Job 실행이 완료되었거나 cancel 완료되었는지 여부 표시
+
+
+
+**Summary**
+
+![image-20220413174441561](https://tva1.sinaimg.cn/large/e6c9d24egy1h186sqsnbkj21a00jy0u3.jpg)
+
+
+
+**Job을 생성됨에서 실행 중 상태로 자동으로 넘기지 않기 위한 `CoroutineStart.LAZY` 옵션 Job의 상태**
+
+![image-20220413173830876](https://tva1.sinaimg.cn/large/e6c9d24egy1h186mbydn3j21500a4gm9.jpg)
+
+Job이 CoroutineStart.LAZY 로 생성되면 Job은 생성됨(New) 상태에 머문다.
+
+이 때는 실행 중도 아니고, 취소도 요청되지 않았고, 완료되지도 않았으므로 isAcitive, isCancelled, isCompleted 모두 false
+
+
+
+start(), join() 을 통해 Job이 실행 중 상태로 바뀌면 isActivie가 true
+
+
+
+**Job이 Cancel 되었을 때 상태**
+
+![image-20220413174101516](https://tva1.sinaimg.cn/large/e6c9d24egy1h186oxdl32j21e40o8wgj.jpg)
+
+Job이 취소 중 상태로 바뀌면,
+
+isCancelled는 취소가 요청되었는지에 대한 변수로 cancel이 호출되면 true
+
+하지만, 취소 중인 상태에서는 취소가 완료 되지 않았으므로 isCompleted가 false
+
+
+
+만약 취소가 완료되면 isCompleted는 true
+
+InvokeOnCompletion은 isCompleted의 상태를 관찰하는 메서드로 isCompleted가 false에서 true로 바뀔 때 호출
+
+따라서, 취소가 완료되었을 때도 호출
+
+
+
+**Job이 완료되었을 때 상태**
+
+![image-20220413174351118](https://tva1.sinaimg.cn/large/e6c9d24egy1h186rv390ij21a009u74q.jpg)
+
+
+
+### Deferred
+
+Deferred 직역 : 연기
+
+결과값 수신을 연기한다 라는 뜻, 미래의 어느 시점에 결과값이 올 것을 뜻한다.
+
+**Deferred는 결과값을 수신하는 비동기 작업**
+
+
+
+**Deferred는 Job이다.**
+
+```kotlin
+public interface Deferred<out T> : Job {
+  public suspend fun await() : T
+  public val onAwait : SelectClause1<T>
+  ..
+}
+```
+
+**Defferd는 결과가 있는 비동기 작업을 수행하기 위해 결과 값이 없는 Job을 확장하는 인터페이스이다.**
+
+즉, Defferd는 Job이며, 이로 인해 Deferred는 Job의 모든 특성을 갖는다.
+
+Job의 상태변수, Job의 Exception Handling 모두 Deffered에서 똑같이 적용할 수 있다.
+
+
+
+#### Deferred 생성
+
+**Deferred는 코루틴 async 블록을 이용해 생성될 수 있다.**
+
+Deferred의 결과값을 직접 조작하는 CompletableDeferred도 있지만 있다는 것만 알면 좋다.
+
+```kotlin
+suspend fun main(){
+  val deferred : Deferred<Int> = CoroutineScope(Dispatchers.IO).async{
+    30
+  }
+}
+```
+
+async블록의 마지막줄의 값이 Deferred로 Wrapping되며(Deferred<Int>) 이 값이 바로 Deferred의 결과값이 된다.
+
+
+
+#### Deferred 값 수신 
+
+Deferred에서 결과값을 수신하기 위해서는 Deferred 인터페이스 상의 await() 메서드를 이용한다.
+
+
+
+예를 들어 "Deferred Result" String을 수신할 것으로 예상되는 Deferred가 있고,
+
+코드 상에서 await() 를 호출하면 main() 함수가 수행되는 코루틴은 IO Thread로 부터 Deferred의 결과가 수신될 때까지 일시중단된다.
+
+```kotlin
+suspend fun main(){
+  val deferred : Deferred<String> =
+  	CoroutineScope(Dispatchers.IO).async{
+      "Deferred Result"
+    }
+  
+  val deferredResult = deferred.await()		//deferred 에서 결과가 올 때까지 일시 중단
+  
+  println(deferredResult)									// Deferred Result
+}
+```
+
+따라서 별도의 delay() 가 없더라도 Main Thread가 IO Thread로부터 결과값을 수신 받을 때까지 일시중단되기 때문에 Main Thread가 먼저 종료될 일은 없다.
+
+
+
+#### Deferred, Job 차이점
+
+예외가 자동으로 전파되는 Job과 달리
+
+Deferred는 예외를 자동으로 전파하지 않는다
+
+이는 Deferred가 결과값 수신을 대기해야 하기 때문이다.
+
+Deferred는 결과값 수신을 대기하고 예외를 전파하기 위해 특수한 메서드를 사용하는데, 그것이 바로 위에서 다룬 Deferred 인터페이스 상의 결과값 수신 메서드인 await() 이다.
+
+
+
+**// 예시는 나중에**
+
 
 
 ## Coroutine 사용

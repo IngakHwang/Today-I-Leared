@@ -46,6 +46,14 @@ BLE은 전력 소모를 줄이는 것에 초점을 맞추며 헬스케어, 피�
 
 ​	BLE + 블루투스 모두 지원하는 듀얼 모드 (Bluetooth SMART Ready)
 
+----
+
+Bluetooth Classic은 음악 재생과 같은 연속적인 데이터 스트림을 전송하도록 설계
+
+BLE는 전력 효율성에 최적화
+
+
+
 ![img](http://www.ktword.co.kr/img_data/5403_1.JPG)
 
 ![img](https://iotlab.tertiumcloud.com/wp-content/uploads/2020/08/Classic-Bluetooth-vs-BLE.png)
@@ -168,6 +176,10 @@ GATT에 의해 정의되는 BLE 시스템의 데이터 구조는 아래 그림�
 
 **Service**
 
+> A collection of characteristics (data fields) that describes a feature of a device
+>
+> 장치의 기능을 설명하는 특성(데이터 필드) 모음
+>
 > 하나의 서비스는 특성들의 집합
 >
 > 특정 앱을 구현하기 위해 필요한 데이터의 집합
@@ -270,19 +282,43 @@ ATT에 의해 부여된 속성은 특성 (characteristic)과 서비스(Service)�
 
 **Characteristic**
 
+> An entity containing meaningful data that can typically be read from or written to
+>
+> 일반적으로 읽거나 쓸 수 있는 의미 있는 데이터를 포함하는 엔티티
+
 하나의 특성(characteristic)은 하나의 값과 n개의 Descriptor를 포함
 
 
 
 **Descriptor**
 
+> A[ defined attribute](https://www.bluetooth.com/specifications/gatt/descriptors/) that describes the characteristic that it’s attached to
+>
+> 연결된 특성을 설명하는 정의된 속성
+
 특성의 값을 기술
 
 
 
+**Notifications**
+
+>  A means for a BLE peripheral to notify the central when a characteristic’s value changes.
+>
+> 특성 값이 변경되면 BLE 주변 장치가 중앙에서 이를 알리는 수단입니다.
 
 
 
+**Indictations**
+
+> Same as an indication, except each data packet is acknowledged by the central. This guarantees their delivery at the cost of throughput.
+
+
+
+**UUID**
+
+> Universally unique identifier, 128-bit number used to identify services, characteristics and descriptors.
+>
+> Service, Characteristics, Descriptors 를 식별하는 데 사용되는 128 Bit 번호
 
 
 
