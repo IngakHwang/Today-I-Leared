@@ -184,7 +184,7 @@ Thread 하나를 일시중단 가능한 다중 경량 Thread 처럼 활용하는
 
 ### 협력형 멀티 태스킹
 
-협력형 멀티태스킹을 프로그래밍 언어로 표현하자만 Co + Routine 이다.
+협력형 멀티태스킹을 프로그래밍 언어로 표현하자면 Co + Routine 이다.
 
 Co 라는 접두어는 "협력", "함께" 라는 의미를 지니고 있다.
 
@@ -273,13 +273,13 @@ fun plusOne(value : Int) : Int {
 
 그런데 이 함수에 진입할 수 있는 진입점도 여러개이고,
 
-함수를 빠져나갈 수 있는 탈춤절도 여러개이다.
+함수를 빠져나갈 수 있는 탈출점도 여러개이다.
 
 즉, 코루틴 함수는 꼭 `return` 문이나 마지막 닫는 괄호를 만나지 않더라도 언제든지 중간에 나갈 수 있고, 언제든지 다시 나갔던 그 지점으로 들어올 수 있다.
 
 ```kotlin
 fun drawPerson(){
-  startCoroutine{
+  CoroutineScope(Dispatchers.Main).launch{
     drawHead()
     drawBody()
     drawLegs()
@@ -543,6 +543,8 @@ fun goCompany(person : Person){
 
 
 그런데 Rx를 모르는 사람이 본다면 `Observable` 이 무엇인지, `just` 가 무엇인지, `flatMap` 이 무엇인지 모른다. 뿐만 아니라 Rx가 제공하는 operation들이 상당히 많기 때문에 학습 난이도가 있다.
+
+
 
 
 
@@ -1291,6 +1293,127 @@ InvokeOnCompletion은 isCompleted의 상태를 관찰하는 메서드로 isCompl
 
 
 
+### Job Exception Handling
+
+Job의 Exception Handling 방법은
+
+- InvokeOnCompletion 이용
+- CoroutineExceptionHandler 이용
+
+이 있다.
+
+
+
+#### invokeOnCompletion 이용한 Exception Handling
+
+invokeOnCompletion을 코루틴 내부에서 에러가 발생했을 때도 사용 할 수 있다.
+
+```kotlin
+suspend fun main(){
+  val job = CoroutineScope(Dispatchers.IO).launch(){
+    throw IllegalArgumentException()
+  }
+  
+  job.invokeOnCompletion { cause : Throwable? ->
+    println(cause)
+  }
+  
+  job.start()
+  
+  delay(1000)
+}
+
+// java.lang.IllegalArgumnetException 출력
+```
+
+이 방법은 완료가 되었을 때 호출되는 람다식에서 핸들링 하는 것이다.
+
+에러가 발생해 완료되든 Job이 모두 수행되어 완료되든 해당 람다식이 호출되는 것이므로, 에러를 핸들링 하는 부분을 분리하기 위해 조금 더 일반적인 방법인 필요하다.
+
+
+
+#### CoroutineExceptionHandler 이용한 Exception Handling
+
+CoroutineExceptionHandler는 코루틴(Job) 내부에서 오류가 발생했을 때 에러를 처리할 수 있는 CoroutineContext이다.
+
+CoroutineContext에 대해서 간단하게 에러가 발생했을 때 실행되는 람다식이라고 생각하면 편하다.
+
+```kotlin
+suspend fun main(){
+  val exceptionHandler = CoroutineExceptionHandler{ exception ->
+  	println("CoroutineExceptionHandler : $exception")
+	}
+  
+  val job = CoroutineScope(Dispatchers.IO).launch(exceptionHandler){
+    throw IllegalArgumnetException()
+  }
+  
+  delay(1000)
+}
+// CoroutineExceptionHandler : java.lang.IllegalArgumnetException
+```
+
+exceptionHandler는 CoroutineExceptionHandler를 구현하며 exception이 왔을 때 받은 exception을 출력해준다.
+
+
+
+CoroutineExceptionHandler는 여러 Job에 붙일 수 있다.
+
+```kotlin
+suspend fun main(){
+  val exceptionHandler = CoroutineExceptionHandler{ exception ->
+  	println("CoroutineExceptionHandler : $exception")
+	}
+  
+  val job1 = CoroutineScope(Dispatchers.IO).launch(exceptionHandler){
+    throw IllegalArgumnetException()
+  }
+  
+  val job2 = CoroutineScope(Dispatchers.IO).launch(exceptionHandler){
+    throw InterruptedException()
+  }
+  
+  delay(1000)
+}
+// CoroutineExceptionHandler : java.lang.IllegalArgumnetException
+// CoroutineExceptionHandler : java.lang.InterruptedException
+```
+
+
+
+위 코드를 조금 응용해서, when 문을 이용하여 exception에 대해 타입 검사를 해서 에러 유형별로 처리 할 수 있다.
+
+```kotlin
+suspend fun main(){
+  val exceptionHandler = CoroutineExceptionHandler{ exception ->
+  	println("CoroutineExceptionHandler : $exception")
+                                                   
+		when(exception){
+      is IllegalArgumentException -> println("More Argument Needed To Process Job")
+      is InterruptedException -> println("Job Interrupted")
+    }
+	}
+  
+  val job1 = CoroutineScope(Dispatchers.IO).launch(exceptionHandler){
+    throw IllegalArgumnetException()
+  }
+  
+  val job2 = CoroutineScope(Dispatchers.IO).launch(exceptionHandler){
+    throw InterruptedException()
+  }
+  
+  delay(1000)
+}
+// CoroutineExceptionHandler : java.lang.IllegalArgumnetException
+// More Argument Needed To Process Job
+// CoroutineExceptionHandler : java.lang.InterruptedException
+// Job Interrupted
+```
+
+
+
+
+
 ### Deferred
 
 Deferred 직역 : 연기
@@ -1339,13 +1462,13 @@ async블록의 마지막줄의 값이 Deferred로 Wrapping되며(Deferred<Int>) 
 
 #### Deferred 값 수신 
 
-Deferred에서 결과값을 수신하기 위해서는 Deferred 인터페이스 상의 await() 메서드를 이용한다.
+Deferred에서 결과값을 수신하기 위해서는 Deferred 인터페이스 상의 `await()` 메서드를 이용한다.
 
 
 
 예를 들어 "Deferred Result" String을 수신할 것으로 예상되는 Deferred가 있고,
 
-코드 상에서 await() 를 호출하면 main() 함수가 수행되는 코루틴은 IO Thread로 부터 Deferred의 결과가 수신될 때까지 일시중단된다.
+코드 상에서 `await()` 를 호출하면 main() 함수가 수행되는 코루틴은 IO Thread로 부터 Deferred의 결과가 수신될 때까지 일시중단된다.
 
 ```kotlin
 suspend fun main(){
@@ -1360,7 +1483,7 @@ suspend fun main(){
 }
 ```
 
-따라서 별도의 delay() 가 없더라도 Main Thread가 IO Thread로부터 결과값을 수신 받을 때까지 일시중단되기 때문에 Main Thread가 먼저 종료될 일은 없다.
+따라서 별도의 `delay()` 가 없더라도 Main Thread가 IO Thread로부터 결과값을 수신 받을 때까지 일시중단되기 때문에 Main Thread가 먼저 종료될 일은 없다.
 
 
 

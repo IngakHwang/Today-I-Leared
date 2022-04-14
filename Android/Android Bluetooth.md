@@ -435,7 +435,7 @@ BLUETOOTH_CONNECT : 페어링된 블루투스 장치에 연결하는데 필요
 
 BLUETOOTH_PRIVILEGED : 앱이 사용자 상호 작용 없이 블루투스 장치를 페어링하고 전화번호부 접근, 또는 메시지 접근을 허용하거나 허용하지 않도록
 
-BLUETOOTH_SCAN : 근처에 있는 블루투스 장치를 검새갛고 페어링하는 데 필요
+BLUETOOTH_SCAN : 근처에 있는 블루투스 장치를 검색하고 페어링하는 데 필요
 
 참고 사이트 : 공홈 - https://developer.android.com/reference/android/Manifest.permission
 
@@ -514,7 +514,7 @@ fun bluetoothOnOff(){
 
 
 
-## BluetoothBLE Scan
+## BluetoothScan
 
 
 
@@ -620,17 +620,19 @@ binding.scanBtn.setOnClickListener{
 
 
 
-## Bluetooth Scan
+
+
+### Bluetooth Scan 다른 방법
 
 기기 검색을 시작하려면 `startDiscovery()` 를 호출하면 된다. (BluetoothAdapter 객체)
 
-이 프로세스는 비동기식이고 검색이 성공적으로 시작되었는지 나타내는부울 값을 반환한다.
+이 프로세스는 **비동기식**이고 검색이 성공적으로 시작되었는지 나타내는 부울 값을 반환한다.
 
-일반적으로 검색 프로세스는 12초 정도의 조회 스캔과, 검색된 각 긱기의 페이지 스캔을 통해 블루투스 이름을 가져오는 과정이 포함된다.
+일반적으로 **검색 프로세스는 12초 정도의 조회 스캔과, 검색된 각 긱기의 페이지 스캔을 통해 블루투스 이름을 가져오는 과정**이 포함된다.
 
 
 
-앱이 검색된 각 기기에 대한 정보를 수신하려면 `ACTION_FOUND` 인텐트에 대한 BroadcastReceiver를 등록해야 한다.
+**앱이 검색된 각 기기에 대한 정보를 수신하려면 `ACTION_FOUND` 인텐트에 대한 BroadcastReceiver를 등록**해야 한다.
 
 시스템이 각 기기에 대하여 이 인텐트를 브로드캐스트한다.
 
@@ -644,6 +646,8 @@ binding.bluetoothScanBtn.setOnClickListener{
   
   val filter = IntentFilter(BluetoothDevice.ACTION_FOUND)
   registerReceiver(receiver, filter)					//탐색 결과 리시버
+  
+  Thread.sleep(12000)													//검색 하는 데 12초 걸림 (Main 멈추는 문제 있음)
   
   recyclerViewAdapter.notifyDataSetChanged()	//recyclerView itemUpdate
 }
@@ -660,6 +664,104 @@ val receiver = object : BroadcastReceiver(){
   }
 }
 ```
+
+
+
+## Bluetooth Connect
+
+Scan 완료한 BluetoothDevice를 입력값으로 `BluetoothDevice.connectGatt` 를 한다.
+
+Build 버전에 따라 BLE Scan인지, 아닌지 정할 수 있다.
+
+```kotlin
+fun connectToDevice(device : BluetoothDevice){
+        if(bluetoothGatt == null){
+            bluetoothGatt = if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M){
+                device.connectGatt(this, false, gattCallback, BluetoothDevice.TRANSPORT_LE)
+            } else{
+                device.connectGatt(this, false, gattCallback)
+            }
+        }
+    }
+```
+
+
+
+#### BluetoothGattCallback
+
+`connectGatt` 를 하기 위해선 추상 클래스 `BluetoothGattCallback()` 을 구현해야 한다.
+
+- onConnectionStateChange : GATT 클라이언트가 원격 GATT 서버에 연결/해제 되었을 때를 나타내는 콜백
+- onServiceChanged : Service 변경 이벤트가 수신되었음을 나타내는 콜백, 이 이벤트를 수신한다는 것은 GATT 데이터베이스가 원격 장치와 동기화되지 않았음을 의미
+- onServicesDiscovered : 원격장치에 대한 원격 service, characteristic 및 descriptor의 목록이 업데이트 되었을 때, 즉 새로운 서비스가 발견되었을 때 호출되는 콜백
+- onCharacteristicRead : characteristic 읽기 작업의 결과를 보고하는 콜백
+- onCharacteristicWrite : characteristic 쓰기 작업의 결과를 나타내는 콜백
+- onCharacteristicChanged : 원격 characteristic 알림 결과 트리거된 콜백
+
+
+
+1. `onConectionStateChange` : GATT 연결, 해체 이벤트 작성, 연결 되었 때 (BluetoothProfile 확인)
+   - **`BluetoothGatt.discoverServices()` : Bluetooth 기기가 제공하는 서비스 조사**
+2. `onServicesDiscovered` : Bluetooth 기기 Service, Characteristic, Descriptor 목록 발견, 업데이트 되었을 때
+   - **`BluetoothGatt.services` : Bluetooth 기기가 제공하는 서비스를 List로 반환** 
+3. `onCharacteristicChanged`  : Bluetooth 기기에서 return 되는 characteristic 알림되었을 때
+   - **`BluetoothGattCharacteristic.getStringValue(offset : Int)` :  characteristic에서 저장된 값 반환**
+
+```kotlin
+private val gattCallback = object : BluetoothGattCallback(){
+        override fun onConnectionStateChange(gatt: BluetoothGatt?, status: Int, newState: Int) {
+           Log.d(LOG,"onConnectionStateChange [$status] [$newState]")
+            
+            when(newState){
+                BluetoothProfile.STATE_CONNECTED -> {
+                    Log.d(LOG, "Attempting to start service discovery")
+                    bluetoothGatt?.discoverServices()
+                }
+
+                BluetoothProfile.STATE_DISCONNECTED-> {
+
+                }
+            }
+        }
+
+        override fun onServicesDiscovered(gatt: BluetoothGatt?, status: Int) {
+            if(status == BluetoothGatt.GATT_SUCCESS){
+                val list : MutableList<BluetoothGattService> = gatt?.services as MutableList<BluetoothGattService>
+                Log.d(LOG, "list : $list")
+
+                gatt.services?.let { checkGattServices(it) }
+            }
+        }
+
+        override fun onCharacteristicRead(
+            gatt: BluetoothGatt?,
+            characteristic: BluetoothGattCharacteristic?,
+            status: Int
+        ) {
+            
+            }
+        }
+
+        override fun onCharacteristicWrite(
+            gatt: BluetoothGatt?,
+            characteristic: BluetoothGattCharacteristic?,
+            status: Int
+        ) {
+            
+            }
+        }
+
+        override fun onCharacteristicChanged(
+            gatt: BluetoothGatt?,
+            characteristic: BluetoothGattCharacteristic?
+        ) {
+            notification = characteristic?.getStringValue(0)!!
+            Log.d(LOG, "onCharacteristicChanged : $notification")
+        }
+    }
+```
+
+
 
 
 
