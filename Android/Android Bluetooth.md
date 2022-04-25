@@ -322,6 +322,24 @@ ATT에 의해 부여된 속성은 특성 (characteristic)과 서비스(Service)�
 
 
 
+### MTU
+
+> Maximum Transmission Unit
+>
+> 네트워크 인터페이스에서 세그먼트 없이 보낼 수 있는 최대 데이터그램 크기
+
+네트워크 인터페이스에서 세그먼트 없이 보낼 수 있는 최대 데이터그램 크기 값이다.
+
+만약 데이터가 MTU 값 이상이라면 여러 개의 패킷으로 분할이 될 것이다.
+
+
+
+블루투스 통신 할 때 MTU는 기본 20 Byte로 설정 되어 있고 최대 512 Byte까지 늘릴 수 있다.
+
+늘리기 위해선 `BluetoothGatt.requestMtu(Byte : Int)` 사용하면 된다.
+
+
+
 ## Bluetooth Class
 
 - **BluetoothAdapter**
