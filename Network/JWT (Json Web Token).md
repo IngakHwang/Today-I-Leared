@@ -1,10 +1,88 @@
 # JWT (Json Web Token)
 
+
+
+## JWT 란
+
+JWT는 JSON Web Token의 약자로 전자 서명된 URL-safe(URL로 이용할 수 있는 문자만 구성된)의 JSON 이다.
+
+전자 서명은 JSON의 변조를 체크 할 수 있게 되어 있다.
+
+JWT는 속성 정보 (Claim)를 JSON 데이터 구조로 표현한 토큰으로 RFC7519 표준이다.
+
+JWT는 서버와 클라이언트 간 정보를 주고 받을 때 Http 리퀘스트 헤더에 JSON 토큰을 넣은 후 서버는 별도의 인증 과정 없이 헤더에 포함되어 있는 JWT 정보를 통해 인증한다.
+
+이 때 사용되는 JSON 데이터는 URL-Safe 하도록 URL에 포함할 수 잇는 문자만으로 만든다.
+
+JWT는 HMAC 알고리즘을 사용하여 비밀키 또는 RSA를 이용한 Public Key / Private Key 쌍으로 서명할 수 있다.
+
+
+
+## JWT 관련된 표준 JWS와 JWE
+
+JWS : JSON WEB SIGNATURE
+
+JWE : JSON WEB ENCRYPTION
+
+
+
+JWT와 관련된 표준으로 JWS는 JSON 데이터 구조를 사용하는 서명 표준으로 RFC7515이며,
+
+JWE는 JSON 데이터 구조를 사용하는 암호화 방법으로 RFC7516 표준이다.
+
+
+
+JWS는 간단히 말하면 "JSON으로 전자 서명하여 URL-safe 문자열을 표현한 것"
+
+JWE는 "JSON을 암호화하여 URL-safe 문자열로 표현한 것"
+
+서명은 서명할 때 사묭한 키를 사용하여 JSON이 손상되지 않았는지 확인 할 수 있도록 하는 것이다.
+
+URL safe는 말 그대로 URL에 포함 할 수 없는 문자를 포함하지 않는 것이다.
+
+
+
+## JWT Token 구성
+
+JWT는 세 파트로 나누어지며, 각 파트는 점으로 구분하여 xxxxx.yyyyy.zzzzz 이런 식으로 표현된다.
+
+![image-20220427181427288](https://tva1.sinaimg.cn/large/e6c9d24egy1h1oec2srhpj210o09awfl.jpg)
+
+순서대로 헤더(header), 페이로드(payload), 서명(signature) 으로 구성된다.
+
+Base64 인코딩의 경우 "+", "/","=" 이 포함되지만 JWT는 URI에서 파라미터로 사용할 수 있도록 URL-Safe한 Base64url 인코딩을 사용한다.
+
+
+
+Header는 토큰의 타입과 해시 암호화 알고리즘으로 구성되어 있다.
+
+첫째는 토큰의 유형(JWT)를 나타내고, 두번째는 HMAC, SHA256 또는 RSA와 같은 해시 알고리즘을 나타내는 부분이다.
+
+
+
+Payload는 토큰에 담을 클레임(claim) 정보를 포함하고 있다.
+
+Payload에 담는 정보의 한 '조각'을 클레임이라고 부르고, 이는 name / value 의 한 쌍으로 이뤄져 있다.
+
+토큰에는 여러 개의 클레임 들을 넣을 수 있다.
+
+클레임에 정보는 등록된(registered) 클레임, 공개(public) 클레임, 비공개(private) 클레임으로 세 종류가 있다.
+
+
+
+마지막으로 Signature는 secret key를 포함하여 암호화되어 있다.
+
+
+
+# JWT 출처 티스토리
+
 > Json 포맷을 이용하여 사용자에 대한 속성을 저장하는 Claim 기반의 Web Token
 >
 > 모바일이나 웹의 사용자 인증을 위해서 사용하는 암호화된 토큰을 의미
 
 
+
+## JWT 란
 
 JWT(Json Web Token)란 Json 포맷을 이용하여 사용자에 대한 속성을 저장하는 Claim 기반의 Web Token이다.
 
@@ -99,6 +177,10 @@ signature = SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c
 
 - 길이 claim에 넣는 데이터가 많아질 수록 JWT 토큰이 길어진다. API 호출 시 매 호출마다 토큰 데이터를 서버에 전달해야 하는 데 길이가 길다는 것은 그만큼 네트워크 대역폭 낭비가 심할 수 있다.
 - 보안 JWT는 기본적으로 Payload에 대한 정보를 암호화 하지 않는다. 단순히 BASE64로 인코딩만 하기 때문에 중간에 패킷을 가로채거나 기타 방법으로 토큰을 취득했으면 디코딩을 통해 데이터를 볼 수 있다. 그래서 JWE(JSON Web Encryption) 을 통해 암호화 하거나 중요데이터를 Payload에 넣지 말아야 한다.
+
+
+
+
 
 
 
