@@ -108,8 +108,61 @@ UML로 명세화된 설계모델은 Java, C++ 등 다양한 언어의 소스코�
 
 
 
+### 시퀀스 다이어그램 (Sequence Diagram)
+
+> 문제 해결을 위한 객체를 정의하고 객체 간의 상호작용 메시지 시퀀스를 시간의 흐름에 따라 나타내는 다이어 그램
+
+
+
+#### 구성요소
+
+- 활성 객체
+
+  시스템의 행위자 혹은 시스템 내의 유효한 객체
+
+  라이프 라인(Life line)을 가진다.
+
+  ​	라이프 라인 : 상호작용에 참여하는 오브젝트를 의미
+
+  <img src="https://tva1.sinaimg.cn/large/e6c9d24egy1h1u416wk3rj20ls0ho0t4.jpg" alt="image-20220502165123036" style="zoom:50%;" />
+
+- 메시지 (Message)
+
+  서로 다른 객체간의 상호작용 혹은 의사소통 통신을 정의하는 요소
+
+  하나의 객체 라이프라인으로 부터 다른 객체 라이프라인까지 선 + 화살표로 표시되며 메시지는 그 선의 위에 표시
+
+  <img src="https://tva1.sinaimg.cn/large/e6c9d24egy1h1u42gtlilj20lo0juwf7.jpg" alt="image-20220502165239793" style="zoom:45%;" />
+
+  - 메시지 유형
+
+    - 동기 메시지 : 메시지 전송 객체가 계속하기 전까지 동기 메시지에 대한 응답을 기다림
+    - 비동기 메시지 : 메시지 전송 객체가 계속하기 전까지 응답을 요구하지 않는 메시지
+    - 자체 메시지 : 자신에게 보낸 메시지
+    - 반환 메시지 : 이전 호출의 반환을 기다리는 객체에게 다시 반환되는 메시지
+
+    <img src="https://tva1.sinaimg.cn/large/e6c9d24egy1h1u4506epoj20vy0majt8.jpg" alt="image-20220502165506060" style="zoom:45%;" />
+
+- 활성 박스 (Activation box)
+
+  객체 라이프 라인 위에 그려지는 박스로 이 박스 위에서 객체의 호출이 이루어진다.
+
+  객체의 특정 메소드 실행 혹은 정보 처리가 실행되고 있거나 다른 객체의 메소드가 종료되기를 기다린다는 것을 나타낸다.
+
+  <img src="https://tva1.sinaimg.cn/large/e6c9d24egy1h1u46g3865j20m60f0t9c.jpg" alt="image-20220502165629035" style="zoom:50%;" />
+
+#### 작성 예시
+
+![Concent Bluetooth Connect Sequence Diagram](https://tva1.sinaimg.cn/large/e6c9d24egy1h1u47h8vc4j214w0ruac6.jpg)
+
+
+
 
 
 ----
 
-참고 사이트 : https://velog.io/@hanblueblue/UML-UML-%EA%B8%B0%EC%B4%88
+참고 사이트
+
+velog : https://velog.io/@hanblueblue/UML-UML-%EA%B8%B0%EC%B4%88
+
+티스토리 : https://thinking-jmini.tistory.com/29
