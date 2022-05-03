@@ -111,3 +111,30 @@ subscribeOn 보다 onserveOn의 우선순위가 높기 때문에 각각 Thread �
 
 `subscribe()` 는 구독자를 등록하는 함수로 Observer 인스턴스로 할당해도 되고 예시처럼 등록도 가능
 
+
+
+3가지
+
+첫번째, 주요요소인 일련의 값들을 발행하는 Observable (관찰될 수 있는 것, 관찰되는 대상이란 뜻)
+
+​	Observable 에서 1~20 까지 정수를 반환하는 데, 이렇게 연속적으로 발행되어 나오는 값들을 Stream (흐름) 이라고 한다.
+
+​	이 Stream을 타고 흐르는 값들은 Pipe 라는 배관을 타고 
+
+두번째, 주요요소인 Operator, 연산자들의 손을 거치게 된다.
+
+​	Operator들은 작업을 처리하기 위한 순수 함수들이다.
+
+마지막으로 Observer, 관찰자란 뜻
+
+​	Oberserver는 Pipe만 쳐다보며 값을 기다리다가 뭔가 나오는 대로 최종 작업을 실행 
+
+​	Oberserver가 Pipe를 주시하며 발행물을 기다리는 것을 ReactiveX 에서는 subscribe, 구독한다고 표현한다.
+
+​	
+
+ReactiveX의 장점은 
+
+평면적인 배열, 1차원적인 값들 뿐 아니라
+
+시간의 흐름, 사용자의 동작, 네트워크 요청의 결과까지 전부 Stream 으로 만들어서 위와 같은 형식으로 PipeLine으로 흘려보내 처리한다는 것
