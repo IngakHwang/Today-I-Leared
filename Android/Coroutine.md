@@ -1505,6 +1505,78 @@ Deferred는 결과값 수신을 대기하고 예외를 전파하기 위해 특�
 
 ## Coroutine 사용
 
+- Coroutine builder
+  - launch
+  - runBlocking
+- Scope
+  - CoroutineScope
+  - GlobalScope
+- Suspend function
+  - suspend
+  - delay()
+  - join
+- Structured concurrency
+
+
+
+```
+- CouroutineScope (and GlobalScope)
+	코루틴의 범위, 코루틴 블록을 묶음으로 제어할 수 있는 단위
+	
+- CoroutineContext
+	코루틴을 어떻게 처리 할 것인지에 대한 여러가지 정보의 집합
+	주요 요소 : Job, dispatcher
+
+- Dispatcher
+	CoroutineContext의 주요 요소
+	CoroutineContext 상속받아 어떤 스레드를 이ㅛㅇ해서 어떻게 동작할 것인지를 미리 정의해 두었음
+	Dispathcers.Default, IO, Main
+
+- launch (and async)
+	launch, async 는 CouroutineScope의 확장함수이며, 넘겨 받은 코드 블록으로 코루틴을 만들고 실행해주는 코루틴 빌더이다.
+	launch 는 Job 객체
+	async 는 Deferred 객체를 반환
+	이 객체를 사용해서 수행 결과를 받거나, 작업이 끝나기를 대기하거나, 취소하는 등의 제어가 가능
+```
+
+
+
+```
+코루틴은 이렇게 쓰면 된다.
+1. 사용할 Dispathcer 결정
+2. Dispathcer 를 이용해서 CoroutineScope 만들고
+3. CoroutineScope의 launch 또는 async에 수행할 코드 블록을 넘기면 된다.
+```
+
+
+
+```kotlin
+// 가장 기본적인 코드
+val scope = Couroutine(Dispathcer.Main)
+
+scope.launch{
+  // 포그라운드 작업
+}
+
+scope.launch(Dispatchers.Default){
+  // CoroutineContext 변경하여 백그라운드로 전환하여 작업 처리
+}
+
+/*========================*/
+
+val scope = CoroutineScope(Dispatchers.Main)
+
+CoroutineScope(Dispatchers.Default).launch{
+  // 새로운 CoroutineScope 로 동작하는 백그라운드 작업
+}
+
+scope.launch(Dispathcers.Default){
+  // 기존 CorotineScope 는 유지하되, 작업만 백그라운드로 처리
+}
+```
+
+
+
 
 
 ### 라이브러리 설정
@@ -1895,6 +1967,106 @@ GlobalScope.launch(Dispatchers.IO){
 ```
 
 
+
+## Example 1
+
+`build.gradle:Module`
+
+> dependencies 추가
+
+```xml
+dependencies{
+	implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.3.9'
+}
+```
+
+ 
+
+`activity_main.xml` 
+
+> UI xml
+
+```xml
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".MainActivity">
+
+    <ImageView
+        android:id="@+id/imagePreview"
+        android:layout_width="242dp"
+        android:layout_height="257dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.498"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:srcCompat="@tools:sample/avatars" />
+
+    <EditText
+        android:id="@+id/editUrl"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:hint="여기에 URL을 입력해주세요."
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/imagePreview" />
+
+    <Button
+        android:id="@+id/buttonDownload"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:text="Button"
+        app:layout_constraintEnd_toEndOf="@+id/editUrl"
+        app:layout_constraintStart_toStartOf="@+id/editUrl"
+        app:layout_constraintTop_toBottomOf="@+id/editUrl" />
+</androidx.constraintlayout.widget.ConstraintLayout>
+```
+
+<img src="https://tva1.sinaimg.cn/large/e6c9d24egy1h1u9wno66hj20ew0pg0t3.jpg" alt="image-20220502201439951" style="zoom:50%;" />
+
+`MainActivity.kt`
+
+> Activity
+>
+> 버튼 클릭 시 text에 기재된 url에서 이미지 다운로드 및 setImage
+
+```kotlin
+class MainActivity : AppCompatActivity() {
+    private val binding by lazy {
+        ActivityMainBinding.inflate(layoutInflater)
+    }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+
+        binding.run {
+            setContentView(root)
+
+            buttonDownload.setOnClickListener {
+                CoroutineScope(Dispatchers.Main).launch {
+                    val url = binding.editUrl.text.toString()
+                    val bitmap = withContext(Dispatchers.IO){
+                        loadImage(url)
+                    }
+                    imagePreview.setImageBitmap(bitmap)
+                }
+            }
+        }
+    }
+}
+
+suspend fun loadImage(imageUrl : String) : Bitmap {
+    val url = URL(imageUrl)
+    val stream = url.openStream()
+    return BitmapFactory.decodeStream(stream)
+}
+```
 
 
 
