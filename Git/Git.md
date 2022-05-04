@@ -785,7 +785,7 @@ Switched to branch 'master'
 
 
 
-### git checkout -b {branch name}
+### `git checkout -b {branch name}`
 
 > {branch name} 생성 및 이동
 

@@ -123,3 +123,71 @@ Ex -> `QRCodeReaderApp_2.4.1_realease`
 위시켓 : https://yozm.wishket.com/magazine/detail/912/
 
 티스토리 : https://sgpassion.tistory.com/564
+
+---
+
+
+
+## JAR
+
+Java Archive
+
+JAR는 해당 플랫폼에서 JAVA 응용 프로그램을 배포하기 위해 고안된 패키지 파일 형식이다.
+
+컴파일된 Java 클래스 파일과 Manifest와 같은 파일들이 포함된다. 기본적으로 ZIP 아카이브 형태
+
+
+
+## AAR
+
+Android Archive
+
+Android 라이브러리 프로젝트의 바이너리 배포판
+
+주로 클래스 파일들만 포함하는 Jar과 달리 리소스 파일들도 포함하고 있다.
+
+확장자 : .aar
+
+
+
+### AAR 만들기
+
+라이브러리를 완성하고 `.aar` 확장자 파일을 만들기
+
+1. Android Studio 오른쪽 상단에 `Gradle` 클릭
+
+   ![image-20220504163056631](https://tva1.sinaimg.cn/large/e6c9d24egy1h1weomy00mj21pe0u0agx.jpg)
+
+2. `Gradle` 안에 코끼리 `Execute Cradle Task` 클릭
+
+   ![image-20220504163222535](https://tva1.sinaimg.cn/large/e6c9d24egy1h1weq0okhvj21pe0u07b5.jpg)
+
+3. Run Anything 창이 뜨면 `gradle assembleRelease` 입력 후 Enter
+
+   assemble + Release인지 Debug 인지에 따라 다름 (Build Variants)
+
+4. 완료되면
+
+   `프로젝트 - app - build - outputs - aar` 경로에 들어가 aar 파일 생성 확인
+
+----
+
+참고사이트
+
+공홈 : https://developer.android.com/studio/projects/android-library?hl=ko#psd-add-library-dependency
+
+티스토리 : https://choidev-1.tistory.com/81
+
+----
+
+## DEX
+
+Dalvik Excutable
+
+DVM (Dalvik Virtual Machine)을 위한 실행 파일이다.
+
+JVM을 위한 .class 파일들과 같은 역할을 한다.
+
+Android SDK의 Dex 컴파일러에 의해 JVM 바이트코드를 DVM 바이트코드로 변환하고 모든 클래스파일들을 Dex 파일에 넣는다.
+
+DEX는 바이너리 파일 형식으로 컴파일 된다.
