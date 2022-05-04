@@ -496,4 +496,308 @@ onComplete()
 
   ![img](https://blog.kakaocdn.net/dn/lEvhA/btqDwEedvIf/9SCbuTHWVlBCJoSCsWcF01/img.png)
 
-  1. `subscribe()` : Disposable (no parameters)
+  #위에서 부터 1~6번
+  
+  1~5번 까지 파라미터 유형은 Observer Instance를 등록하는 게 아닌 필요한 이벤트만 정의하는 유형이다.
+  
+  1~5번 까지 보면 각 파라미터의 타입에 ! 키워드로 내가 원하는 이벤트만 정의가 가능하다.
+  
+  6번 파라미터 유형은 Observer Instance를 등록하는 방식이다.
+  
+  모든 유형에 마찬가지로 `subscribe()` 는 Disposable Instance를 반환하기 때문에 이 Disposable로 구독해제 가능하다.
+
+
+
+##### Observer Instance 등록
+
+Observer Instance 구현하면 4개의 이벤트를 Override 해야하지만 재활용이 가능하다.
+
+```kotlin
+// Observer 선언, 구독자
+// 메소드 오버라이드 하기
+val observer : Observer<Any> = object : Observer<Any> {
+  override fun onSubscribe(d: Disposable) = println("onSubscribe() - $d")
+	override fun onNext(item: Any) = println("onNext() - $item")
+	override fun onError(e: Throwable) = println("onError() - ${e.message}")
+	override fun onComplete() = println("onComplete()")
+}
+```
+
+
+
+##### 필요 이벤트만 정의
+
+필요 메서드만 구현해서 구독할 수 있다.
+
+```kotlin
+// 4개 정의
+Observable.just(1)
+			.subscribe(
+    		{ println("onNext() - $it") },			// onNext() 이벤트
+        { println("onError() - $it") },			// onError() 이벤트
+        { println("onComplete()") },				// onComplete() 이벤트
+        { println("onSubscribe() - $it") }	// onSubscribe() 이벤트
+      )
+
+// 2개 정의
+Observable.just(1)
+			.subscribe(
+  	  	{ println("onNext() - $it") },			// onNext() 이벤트
+        { println("onError() - $it") },			// onError() 이벤트
+      )
+```
+
+
+
+#### 구독해지
+
+- Observer를 subscribe를 통해 구독하면 `onSubscribe(d : Disposable)` 호출로 Disposable Instance를 전달
+
+- Disposable Interface 구조
+
+  ```kotlin
+  public interface Disposable {
+      // 구독해지 요청 메서드
+      void dispose();
+      
+      // 구독해지 상태확인 메서드
+      boolean isDisposed();   
+  }
+  ```
+
+
+
+##### Observer를 통해 구독해지
+
+`onNext()` 에서 if문으로 검사해서 (item 10 이상 and 구독상태확인) 결과확인 및 구독해지 
+
+```kotlin
+// Observer 선언, 구독자
+val observer : Observer<Long> = object : Observer<Long>{
+  lateinit var disposable : Disposable				// 늦은 초기화
+  
+  override fun onSubscribe(d : Disposable){
+    println("onSubscribe() - $d")
+    disposable = d														// disposable 초기화
+  }
+  
+  override fun onNext (item : Long){
+    println("onNext() - $item")
+    if(item >= 10 && disposable.isDisposed == false){	// item 10 이상 and 구독해제가 안되었는지
+      disposable.dispose()														// 구독해제
+      println("subscribe Dispose!")
+    }
+  }
+  
+  override fun onError(e : Throwable){
+    println("onError() - ${e.message}")
+  }
+  
+  override fun onComplete() {
+    println("onComplete()")
+  } 
+}
+
+Observable.interval(100, TimeUnit.MILLISECONDS)	//0.1초 마다 값을 발행하는 interval Observable
+		.subscribe(observer)
+
+Thread(){
+  Thread.sleep(1500)														//1,5초 Thread Block
+}.apply{
+ 	start()
+  join()
+}
+
+//결과
+onSubscribe() - null
+onNext() - 0
+onNext() - 1
+onNext() - 2
+onNext() - 3
+onNext() - 4
+onNext() - 5
+onNext() - 6
+onNext() - 7
+onNext() - 8
+onNext() - 9
+onNext() - 10
+subscribe Dispose!
+```
+
+
+
+##### Disposable을 통한 구독해지
+
+값 발행이 모두 완료된 것이 아닌 중간에 구독해제 상황
+
+`onComplete()` 미호출
+
+```kotlin
+// Observable Instance 생성, 0.1초 간격으로 값 발행
+val observable = Observable.interval(100, TimeUnit.MILLISECONDS)
+
+val disposable : Disposable = observable.subscribe(
+ 	    { println("onNext() - $it")},			// onNext() 정의
+      { println("onError() - ${it.message}")},	// onError() 정의
+      { println("onComplete()")}			// onComplete() 정의
+)
+
+Thread(){
+  Thread.sleep(1200)
+  disposable.dispose()				//Observable 구독해지, dispose()
+}.apply{
+  start()											// Thread 실행
+  join()											// Thread 종료 까지 대기
+}
+
+//결과
+onNext() - 0
+onNext() - 1
+onNext() - 2
+onNext() - 3
+onNext() - 4
+onNext() - 5
+onNext() - 6
+onNext() - 7
+onNext() - 8
+onNext() - 9
+onNext() - 10
+onNext() - 11
+```
+
+
+
+
+
+#### Cold Observable
+
+위의 설명한 Observable들은 subscribe(구독) 신청 시 Observable이 데이터를 순서에 맞춰 전부 내보낸다.
+
+여러번 subscribe 하더라도 처음부터 순서대로 동일한 데이터를 내보내주는 방식
+
+Observable의 데이터는 subscribe 시 소모되는 것이 아닌, 저장된 값을 구독할 때 마다 전부 발행하는 방법
+
+이러한 Observable의 유형을 `Cold Observable` 이라 한다.
+
+- 구독자가 subscribe 시점에 데이터를 배출
+- 처음부터 모든 데이터가 순서대로 배출 (모든 데이터 수신 보장)
+- 여러번 subscribe 에도 동일한 데이터 배출 (데이터 배출 시 소모 X)
+
+
+
+사용 예시 : 웹 요청, DB 관련 요청
+
+
+
+#### Hot Observable
+
+반대로 `Hot Observable` 은 데이터 배출 시점이 subscribe 시점이 아닌,
+
+늦게 구독하는 Observer는 이전 데이터를 받지 못하고 subscrbe 이후의 데이터부터 받게 된다.
+
+- subscribe 와 상관 없이 데이터를 배출
+- subscribe 시점 이후 데이터부터 전달 받으며, 구독 이전의 데이터 수신X (모든 데이터 수신보장 X)
+- Event를 전달 받는 형태로 사용
+
+
+
+사용 예시 : 센서 이벤트, 입력 이벤트
+
+
+
+##### ConnectableObservable
+
+Hot Observable 중 하나로 `connect()` 함수를 호출 시 배출을 시작하는 Observable
+
+Observer는 subscribe와 상관 없이 구독 신청 시점부터 데이터를 전달 받는다.
+
+`publish()` - Cold Observable -> Hot Observable 변환
+
+
+
+ConnectableObservable에 총 3개의 Observer subscribe 한 예시
+
+1,2 번째 Observer를 구독하고 `connect()` 호출 시점에 값이 발행하고,
+
+3 번째 Observer 구독을 했는 데, 이미 `connect()` 값이 모두 발행된 후라 결과를 못받는 걸 확인
+
+`subscribe()` 시점에 값이 발행되지 않는 다는 것이 포인트
+
+```kotlin
+//publish() 함수로 ConnectableObservable 생성
+val connecttableObservable = (1..4).toObservable().publish()
+
+// 1번째 Observer subscribe
+connectableObservable
+		.subscribe{println("first Observer - $it")}
+println("Add First Observer")
+
+// 2번째 Observer subscribe
+connectableObservable
+		.subscribe{println("second Observer - $it")}
+println("Add Second Observer")
+
+// connect() - Observable 데이터 발행
+connectableObservable.connect()
+
+connectableObservable
+		.subscribe{println("third Observer - $it")}
+println("Add Third Observer")
+
+//결과
+Add First Observer
+Add Second Observer
+first Observer - 1
+second Observer - 1
+first Observer - 2
+second Observer - 2
+first Observer - 3
+second Observer - 3
+first Observer - 4
+second Observer - 4
+Add Third Observer
+```
+
+
+
+`interval()` 로 지속발행하는 Observable
+
+`interval()` 로 0.1초 마다 지속적으로 값을 발행하는 Observable을  구현
+
+`publish()` 로 Hot Observable로 변환하여 Observable의 값 발행시점은 `subscribe()` 가 아닌 `connect()` 시점
+
+`connect()` 시점부터 값을 발행해서 1번째 Observer는 0부터 값을 수신
+
+`delay(300)` 으로 인해 0.3초 지연됐던 2번째 Observer는 3부터 값을 수신
+
+```kotlin
+// interval() - 0.1초 마다 값 발행, publish() - Hot Observable 변환
+val connectableObservable = Observable.interval(100, TimeUnit.MILLISECONDS).publish()
+
+// 1번째 Observer 구독
+connectableObservable.subscribe { println("first Observer - $it") }
+
+// connect() - Hot Observable 값 발행 시점
+connectableObservable.connect()
+
+// 0.3초 대기 (Thread 점유)
+runBlocking { delay(300) }
+
+// 2번째 Observer 구독
+connectableObservable.subscribe { println("second Observer - $it") }
+
+// 0.3초 대기 (Thread 점유)
+runBlocking { delay(300) }
+
+// 결과
+first Observer - 0
+first Observer - 1
+first Observer - 2
+first Observer - 3
+second Observer - 3
+first Observer - 4
+second Observer - 4
+first Observer - 5
+second Observer - 5
+```
+
