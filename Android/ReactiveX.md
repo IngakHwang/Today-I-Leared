@@ -4,6 +4,12 @@
 
 
 
+Observer 역할 - 다른 Observable에게 구독하여 item 수신
+
+Observable 역할 - Observable 에게 수신받은 item 재배출 또는 새로운 item배출
+
+
+
 ## 요약
 
 3가지
@@ -163,7 +169,7 @@ subscribeOn 보다 onserveOn의 우선순위가 높기 때문에 각각 Thread �
 이 Callback 함수들을 구현해서 Observable에 등록하면 Observable이 전달하는 이벤트를 받는다. 
 
 ```kotlin
-val observer : Observer<Int> = object : <Int> {
+val observer : Observer<Int> = object : Observer<Int> {
   override fun onSubscribe(d : Disposalbe){ // 구독 시 호출
   	println("onSubscribe() - $d")
   }
@@ -799,5 +805,183 @@ first Observer - 4
 second Observer - 4
 first Observer - 5
 second Observer - 5
+```
+
+
+
+### Subject
+
+> Observable + Observer
+
+- `publish()` 처럼 Cold Observable -> Hot Observable 변환하는 클래스
+- Subject는 Obervable + Observer
+  - Observable 이면서 Observer 역할 수행
+  - Observer 역할 - 다른 Observable에게 구독하여 item 수신
+  - Observable 역할 - Observable에게 수신받은 item 재배출 또는 새로운 item 배출
+
+##### `PublishSubject`
+
+등록 시점 이후부터 데이터를 수신하는 Subject
+
+`PublishSubject.create<T>()`
+
+<img src="https://blog.kakaocdn.net/dn/stXyy/btqDzk0xeb2/qCCrGtK9SbItmBb0xLnFQk/img.png" alt="img" style="zoom:50%;" />
+
+observable은 `interval()` 로 0.1초마다 지속적으로 값을 생성하는 Cold Observable, `subscribe()` 시 발행
+
+subject가 observable을 subscribe 하는 시점부터 observable의 값이 발행 시작
+
+이후 0.3초 후에 1번째 Observer를 subject에 등록하면, 3번째 데이터 수신
+
+이후 0.3초 후에 2번째 Observer를 subject에 등록하면, 6번째 데이터 수신
+
+​	-> observable은 Cold Observable인데, subject를 통해 Hot Observable 처럼 동작하는 예시
+
+```kotlin
+val observable = Observable.interval(100, TimeUnit.MILLISECONDS)
+
+val subject = PublishSubject.create<Long>()	// PublishSubject 생성, Observable + Observer Type
+
+observable.subscribe(subject)								// subject가 구독 (subject - Observer 역할)
+
+runBlocking {delay(300)}										// 0.3초 대기
+
+subject.subscribe {println("1st : $it")}		// subject에 1번째 Observer 등록, (subject - Observable역할)
+
+runBlocking {delay(300)}
+
+subject.subscribe {println("2nd : $it")}		// subject에 2번째 Observer 등록, (subject - Observable역할)
+
+runBlocking {delay(300)}
+
+//결과
+1st : 3
+1st : 4
+1st : 5
+1st : 6
+2nd : 6
+1st : 7
+2nd : 7
+1st : 8
+2nd : 8
+```
+
+
+
+##### `BehaviorSubject`
+
+등록 시점 이전에 배출된 직전값 하나를 전달받고 시작
+
+Subscribe 시점에 데이터가 아직 없으면 기본값을 전달
+
+`BehaviorSubject.createDefault(defaultValue)` - 데이터가 아직 없으면 Default 값 전달
+
+<img src="https://blog.kakaocdn.net/dn/bbMuK1/btqDwd3fox4/A7sJ4PJXkWhFKPB5iGka7K/img.png" alt="img" style="zoom:50%;" />
+
+PublishSubject에서 수신했던 값과 다르게 바로 직전의 값을 수신해서 출력
+
+1번째 Subscriber는 onNext 호출전이라 데이터가 없으므로 기본값 5를 처음 수신
+
+2번째 Subscriber는 subscribe 이전의 데이터 2를 먼저 수신
+
+```kotlin
+val subject = BehaviorSubject.createDefault("5")
+subject.subscribe{ data -> println("Subscriber #1 -> $data")}
+subject.onNext("1")
+subject.onNext("2")
+
+subject.subscribe{data -> println("Subscriber #2 -> $data")}
+subject.onNext("3")
+subject.onComplete()
+```
+
+
+
+##### `AsyncSubject`
+
+Observable의 마지막값을 한번만 배출
+
+​	마지막값 -> `onComplete()` 이후 가장 최신 데이터
+
+`AsyncSubejct.create<T>()`
+
+<img src="https://blog.kakaocdn.net/dn/E4O6X/btqDyN9JkIs/yOgzVhklCnqSQedMYGawd0/img.png" alt="img" style="zoom:50%;" />
+
+AsyncSubject에 0.3초 간격을 두고 2개의 Observer를 구독신청
+
+결과로는 2개의 Observer 모두 10값 수신
+
+AsyncSubject는 쉽게 Observable의 마지막 발행된 값을 저장
+
+이후 `subscribe()` 시 저장한 마지막 값을 발행해주는 Subject
+
+```kotlin
+// Cold Observable, 1부터 10개의 값 발행
+val observable = Observable.range(1,10)
+
+// AsyncSubject 생성
+val subject = AsyncSubject.create<Int>()
+
+// observable 값 발행시작
+observable.subscribe(subject)			
+
+subject.subscribe { println("1st : $it") }	
+runBlocking { delay(300) }			
+
+subject.subscribe { println("2nd : $it") }
+
+// 결과
+
+1st : 10
+2nd : 10
+```
+
+
+
+##### `ReplaySubject`
+
+Cold Observable과 비슷하게 등록 시점 이전값을 모두 수신받은 후 새로 배출되는 값을 전달
+
+`RepleaySubject.create<T>()`
+
+<img src="https://blog.kakaocdn.net/dn/t0wtY/btqDxI2lxjI/g9BOhpo9H0jrNPp6IYABr1/img.png" alt="img" style="zoom:50%;" />
+
+observable은 `interval()` 로 0.1초마다 지속적으로 값을 생성하는 Cold Observable, `subscribe()` 시 발행
+
+subject가 observable을 subscribe 하는 시점 부터 observable의 값이 발행 시작
+
+이후 200ms 이후에 1번째 Observer를 subject에 등록하면, 이전값(0,1) 모두 수신
+
+이후 200ms 이후에 2번째 Observer를 subject에 등록하면, 이전값(0,1,2,3,) 모두 수신
+
+```kotlin
+// Cold Observable, 0.1초마다 값 생성 (subscribe 호출 시 발행시작)
+val observable = Observable.interval(100,TimeUnit.MILLISECONDS)
+
+val subject = ReplaySubject.create<Long>()	// ReplaySubject, Observable + Observer Type
+
+observable.subscribe(subject)			// subject가 구독(subject - Observer역할)
+runBlocking { delay(200) }			// 0.2초 대기
+
+subject.subscribe { println("1st : $it") }	// subject에 1번째 Observer 등록, (subject - Observable역할)
+runBlocking { delay(200) }			// 0.2초 대기
+
+subject.subscribe { println("2nd : $it") }	// subject에 2번째 Observer 등록, (subject - Observable역할)
+runBlocking { delay(200) }			// 0.2초 대기
+
+// 결과
+
+1st : 0
+1st : 1
+1st : 2
+1st : 3
+2nd : 0
+2nd : 1
+2nd : 2
+2nd : 3
+1st : 4
+2nd : 4
+1st : 5
+2nd : 5
 ```
 
