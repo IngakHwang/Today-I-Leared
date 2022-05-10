@@ -39,6 +39,50 @@ Kotlin에서 주로 쓰는 Scope function이 있다.
 
 
 
+![img](https://miro.medium.com/proxy/1*pLNnrvgvmG6Mdi0Yw3mdPQ.png)
+
+
+
+Standard Function 선택 기준
+
+
+
+1. 자기 자신을 리턴해야 하는 가?
+
+   YES
+
+   1-1 IT 으로 리턴해야 하는가 -> `also()`
+
+   1-2 THIS 으로 리턴해야 하는가? -> `apply()`
+
+
+
+​		No
+
+​		2. Null check나 Method Chaining을 해야하는가?
+
+​			YES
+
+​			2-1 IT으로 리턴 -> `let()`
+
+​			2-2 THIS로 리턴 -> `run()`
+
+​			
+
+​			NO
+
+​			3. 파라미터 사용 하는가?	
+
+​				YES
+
+​				3-1 `with()`
+
+​				No
+
+​				3-2 `run()`
+
+
+
 ## Summary
 
 `apply` : this, 객체 리턴
