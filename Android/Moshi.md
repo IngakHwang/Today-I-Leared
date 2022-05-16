@@ -74,3 +74,140 @@ data class PokemonList(
 참고 사이트
 
 코틀린월드 : https://kotlinworld.com/117?category=921149
+
+
+
+
+
+## Moshi 적용
+
+
+
+### Built-in Type Adapters
+
+>  moshi는 Build-in 으로 Kotlin의 주요 기능들을 일거나 쓸 수 있게 도와준다.
+
+- Primitives (int, float, char ...)
+- Arrays, Collections, Lists, Sets, Maps
+- String
+- Enums
+
+
+
+### Custom Type Adapter
+
+> moshi 의 특징으로 `@ToJson`, `@FromJson` 을 지정해서 원하는 클래스의 Adapter를 원하는 대로 구성 할 수 있다.
+
+```kotlin
+class CardAdapter{
+  @ToJson 
+  fun toJson(card : Card) : String {
+  	return "${card.rank} ${card.suit.name().substring(0,1)}"  
+  }
+  
+  @FromJson
+  fun fromJson(card : String) : Card {
+    if(card.length() != 2) throw JsonDataException("Unknown card : $card")
+    
+    val rank = card[0]
+    return when (card[1]) {
+      'C' -> Card(rank, Suit.CLUBS)
+      'D' -> Card(rank, Suit.DIAMONDS)
+      'H' -> Card(rank, Suit.HEARTS)
+      'S' -> Card(rank, Suit.SPADES)
+      else -> throw JsonDataException("unknown suit: $card")
+    }
+  }
+}
+
+val moshi = Moshi.Builder()
+		.add(CardAdpater())
+		.build()
+```
+
+또다른 예시 링크 : https://gist.github.com/swankjesse/61354fd0a20bf56072f6a1d0c82fb9fc
+
+
+
+### Adapter convenience methods
+
+> moshi Adapter에서는 편의성을 위한 함수들이 여러가지 존재한다.
+
+- nullSafe() : Adpater에서 제공하는 fromJson / toJson에 대한 결과가 null을 허용해준다. 기본적으로 nullsafe
+- nonNull() : Adapter에서 제공하는 fromJson / toJson에 대한 결과가 null을 허용하지 않는다.
+- lenient() : Json의 형식을 느슨하게 바꿔준다. (???)
+- indent() : `adapter.toJson()` 호출 할 때 읽기 쉽게 indent를 추가
+- serializeNulls() : `adpater.toJson()` 호출 할 때 null도 직렬화가 된다.
+
+
+
+### Fails Gracefully
+
+일반적으로 Reflection과 달리 Moshi는 일이 잘못 될 때 도움을 주기 위해 고안되어 JSON 문서를 읽는 중 오류가 발생하거나 형식이 잘못된 경우 java.io.IOException을 발생키시고, 타입 포맷과 일치하지 않으면 JsonDataException이 발생한다.
+
+
+
+### Custom field name
+
+Moshi는 @Json(name = "name")을 활용해서 json에 이름과 변수의 이름을 다르게 설정하고 매핑 할 수 있다.
+
+`@Json(name = "closed_issues") val closedCount : Long`
+
+
+
+### @JsonQualifier
+
+커스텀 어댑터를 사용할 때 같은 타입의 값에 대한 특별한 처리를 하고 싶을 때 @JsonQualifierf를 활용하면 된다.
+
+
+
+아래와 같이 colorItem에 다 같은 int 값인데 다르게 처리하고 싶을 때 CustomAdapter를 만들어서 Moshi빌드 할 때 넣어주고 adapter를 빼면 된다.
+
+여기서 헷갈릴 수 있는 게 CustomAdapter 가 ColorItem에 대한 encoding이나 decoding을 해주는 것이 아니고 하나의 어노테이션에 대해서만 특별하게 처리해준다.
+
+```kotlin
+@JsonClass(generateAdapter = true)
+data class ColorItem(val width : Int, val height : Int, @HexColor val color : Int)
+
+class CustomAdapter{
+    @ToJson
+    fun toJson(@HexColor rgb: Int): String? {
+        return String.format("#%06x", rgb)
+    }
+
+    @FromJson
+    @HexColor
+    fun fromJson(rgb: String): Int {
+        return rgb.substring(1).toInt(16)
+    }
+}
+
+//사용예시
+val moshi = Moshi.Builder().add(CustomAdpater()).build()
+val itemAdapter = moshi.adapter(ColorItem::class.java)
+val item = itemAdapter.fromJson(colorJson)
+```
+
+
+
+### @transient
+
+특정 모델들은 데이터를 json에 포함시키고 싶지 않은 값들이 있을 수 있다.
+
+이럴 때 @Transient 를 활용하면 된다.
+
+fromJson , toJson 할 때 해당 값을 Skip 하게 되고 만약 @Transient 어노테이션이 있음에도 불구하고 Json에 해당 값이 있다면 크래시가 난다.
+
+그래서 @Transient 가 달렸다면 반드시 default Value를 선언해줘야 한다.
+
+
+
+
+
+-----
+
+참고 사이트
+
+깃험 : https://colinch4.github.io/2020-12-03/android_moshi/
+
+moshi github : https://github.com/square/moshi#reflection
