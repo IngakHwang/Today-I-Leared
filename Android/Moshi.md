@@ -188,6 +188,68 @@ val itemAdapter = moshi.adapter(ColorItem::class.java)
 val item = itemAdapter.fromJson(colorJson)
 ```
 
+----
+
+ex)
+
+객체 A를 Adapter를 이용하여 객체B로 바꾸지만 그 내용 중에서 한 두개를 바꾸는 건데 비효율적임
+
+Moshi에서 `@JsonQualifier` 를 이용하여 수정이 가능하다.
+
+파싱 전체를 바꾸는 것이 아니라 개중 몇 개만 수정하고 싶은 경우라면 `JsonQualifier`를 사용하는 것이 훨씬 좋다.
+
+- `@JsonQualifier` 를 이용하여 필드에 적용할 커스텀 Annotation 을 만든다.
+- 필드에 커스텀 Annotation을 달아준다.
+- Adapter를 만들어 무엇이 어떻게 바뀔지 정한다.
+- Moshi에 추가
+
+
+
+#### Custom Annotation
+
+```kotlin
+@Retentaion(AnnotationRetention.RUNTIME)
+@JsonQualifier
+annotation class HasWarning {}
+```
+
+
+
+#### 필드에 커스텀 Annotation 적용
+
+```kotlin
+@JsonClass(generateAdapter = true)
+@Entity(tableName = Const.TABLE_CRYPTO_CURRENCY, primaryKeys = [Const.COLUMN_TICKER])
+data class CryptoCurrency(
+	...
+  @Json(name = Const.JSON_UPBIT_MARKET_WARNING)
+  @ColumnInfo(name = Const.COLUMN_HAS_WARNING)
+  @HasWarning
+  val hasWarning : Boolean
+)
+```
+
+
+
+#### Adapter를 만들어 무엇이 어떻게 바뀔지 정의
+
+```kotlin
+class CryptoCurrencyAdapter {
+  @FromJson
+  @HasWarning
+  fun fromJson(hasWarning: String): Boolean {
+      return hasWarning == Const.UPBIT_WARNING
+  }
+
+  @ToJson
+  fun toJson(@HasWarning hasWarning: Boolean): String {
+      return if(hasWarning) Const.UPBIT_WARNING else Const.UPBIT_NONE
+  }
+}
+```
+
+
+
 
 
 ### @transient
@@ -211,3 +273,5 @@ fromJson , toJson 할 때 해당 값을 Skip 하게 되고 만약 @Transient 어
 깃험 : https://colinch4.github.io/2020-12-03/android_moshi/
 
 moshi github : https://github.com/square/moshi#reflection
+
+java version 샘플 : https://www.baeldung.com/java-json-moshi
