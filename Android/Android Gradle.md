@@ -117,3 +117,13 @@
 > 열어보면 그냥 안드로이드 SDK가 설치된 경로만 적혀있음
 
 <img src="https://blog.kakaocdn.net/dn/r0tXG/btq9e7kk4Yg/bHMeJ6wReE12hYOjlTQu00/img.png" alt="img" style="zoom:50%;" />
+
+
+
+----
+
+참고사이트
+
+티스토리 : https://uroa.tistory.com/64 , https://curryyou.tistory.com/368
+
+공홈 : https://developer.android.com/studio/build?hl=ko
