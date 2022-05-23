@@ -210,10 +210,69 @@ Maven 아티팩트 유형도 aar
 
 
 
+## 패키지
+
+
+
+### 패키지 이름(Package Name)
+
+- 애플리케이션을 고분하는 고유한 값
+- 내가 만든 앱이 디바이스에 설치되었을 때 다른 앱들과 구분하는 역할을 하므로 유일무이해야 한다.
+
+
+
+### 패키지 명명 방법
+
+Ex)
+
+| 명명방법                           | 예시                             |
+| ---------------------------------- | -------------------------------- |
+| com.회사이름.프로그램이름          | com.autocrypt.program            |
+| com.회사이름.플랫폼.프로그램이름   | com.autocrypt.platform.program   |
+| kr.co.회사이름.프로그램이름        | kr.co.autocrypt.program          |
+| kr.co.회사이름.플랫폼.프로그램이름 | kr.co.autocrypt.platform.program |
+
+
+
+**명명규칙**
+
+- 회사 이름이나 도메인 등은 유니크하기 때문에 사이트명으로 많이 구분
+- 웹사이트 주소를 반대로 기재한 모양으로 패키지 이름을 부여
+- 명칭 소문자 사용
+- 패키지명에 대문자는 사용하지 않는 것이 좋다.
+
+
+
+## Android Library AAR 파일 만들기
+
+1. Create New Module - Android Library 에서 Module name 기재 후 Finish
+
+   <img src="https://tva1.sinaimg.cn/large/e6c9d24egy1h2ieomlifkj214s0tatb2.jpg" alt="image-20220523171327319" style="zoom:50%;" />
+
+2. `build.gradle (Module : 라이브러리)` 에서 plugins 내 id `com.android.application` 에서 `com.android.library` 로 변경
+
+   defaultConfig에서 applicationId 삭제 후 Sync Now
+
+   <img src="https://blog.kakaocdn.net/dn/mnYWj/btq6PDZzGQr/bbHpbzmQiv6d0Nb0g5DTbK/img.png" alt="img" style="zoom:50%;" />
+
+3. Android Studio 우측 상단에 Gradle - 코끼리모양 (Execute Gradle Task) 클릭
+
+   <img src="https://tva1.sinaimg.cn/large/e6c9d24egy1h2ietapnuij21ys0u0jxf.jpg" alt="image-20220523171758902" style="zoom:50%;" />
+
+4. gradle assembleRelease 입력 후 Enter (오타나면 안됨)
+
+   <img src="https://tva1.sinaimg.cn/large/e6c9d24egy1h2ieuouihbj21140nawf3.jpg" alt="image-20220523171846580" style="zoom:50%;" />
+
+5. `프로젝트 - 라이브러리 - build - outputs - aar` 경로에 파일 확인
+
+
+
+
+
 ----
 
 참고 사이트
 
 공홈 : https://developer.android.com/studio/projects/android-library?hl=ko
 
-티스토리 : https://keinetwork.tistory.com/138
+티스토리 : https://keinetwork.tistory.com/138 , https://jroomstudio.tistory.com/78
