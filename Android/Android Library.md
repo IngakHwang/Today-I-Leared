@@ -243,7 +243,7 @@ Ex)
 
 
 
-## Android Library AAR 파일 만들기
+## Library AAR 파일 만들기
 
 1. Create New Module - Android Library 에서 Module name 기재 후 Finish
 
@@ -267,6 +267,33 @@ Ex)
 
 
 
+## Library AAR 파일 사용하기
+
+1. Project - app - libs 내 aar 파일 복붙
+
+   <img src="https://tva1.sinaimg.cn/large/e6c9d24egy1h2j9y4g3zmj20iw0pegnb.jpg" alt="image-20220524111508891" style="zoom:50%;" />
+
+2. `build.gradle (Module : 앱이름.app)` 에서 dependencies 추가
+
+   ```xml
+   dependencies {
+   	implementation files ('libs/라이브러리이름.aar')
+   }
+   ```
+
+   
+
+## 많이 쓰는 라이브러리
+
+```xml
+implementation 'com.jakewharton.timber:timber:4.7.1'				// 로그
+implementation 'com.google.code.gson:gson:2.8.7'						// Json 직렬화, 역직렬화
+implementation 'com.squareup.moshi:moshi-kotlin:1.11.0'			// Json 직렬화, 역직렬화
+implementation 'com.squareup.moshi:moshi-adapters:1.11.0'		// Json 직렬화, 역직렬화
+```
+
+
+
 
 
 ----
@@ -275,4 +302,4 @@ Ex)
 
 공홈 : https://developer.android.com/studio/projects/android-library?hl=ko
 
-티스토리 : https://keinetwork.tistory.com/138 , https://jroomstudio.tistory.com/78
+티스토리 : https://keinetwork.tistory.com/138 , https://jroomstudio.tistory.com/78 , https://greensky0026.tistory.com/200
