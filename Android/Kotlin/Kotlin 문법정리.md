@@ -1698,8 +1698,6 @@ fun main(){
 
 확장 함수 사용방법 : https://codechacha.com/ko/kotlin-extension-functions/
 
------
-
 
 
 ## Keyword
@@ -1756,11 +1754,49 @@ MyFunction("hello")
 
 
 
-
-
 ----
 
 읽어 보면 좋은 사이트
 
 1. 코틀린 스타일 가이드 : https://developer.android.com/kotlin/style-guide
+
 2. 코틀린 키워드 연산자 : https://runebook.dev/ko/docs/kotlin/docs/reference/keyword-reference
+
+   
+
+## 새로운 내용 정리
+
+
+
+### Spread Operator
+
+> 배열을 단순 나열 할 때 사용 
+>
+> `*`
+
+Spread : 퍼지다, 펼치다
+
+
+
+코틀린의 Spread Operator `*` 는 배열을 단순 나열 할 때 사용한다.
+
+ex)`*list` 의 의미 -> list의 요소들을 단순 나열하겠다. 라는 의미
+
+
+
+```kotlin
+val array = arrayOf("aa","bb","cc")
+
+//val array2 = arrayOf(array[0], array[1], array[2], "dd", "cc")
+val array2 = arrayOf(*array, "dd"" "cc")
+```
+
+
+
+
+
+----
+
+참고사이트
+
+Spread Operator : 티스토리 - https://seosh817.tistory.com/category/Android/Kotlin%28Java%29
