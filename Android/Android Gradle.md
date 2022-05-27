@@ -6,6 +6,27 @@
 
 
 
+## Gradle 이란?
+
+CI/CD를 위한 아래 Task 들을 자동화 시켜주는 Build Tool
+
+- Compile
+- Test
+- Packaging
+- Deploy & Run
+
+
+
+Compile은 Kotlin, Java 파일을 바이트 코드로 변환해주는 작업
+
+Test 는 앱이 제대로 동작할지에 대한 Test (유닛테스트, UI 테스트 등) 지원
+
+Packaging은 코드를 패키징하여 aab 파일, apk 파일을 만들어 주는 것
+
+Deploy & Run 은 코드를 앱으로 패키징해서 실제 기기에 넣어서 실행할 수 있도록 만들어주는 것
+
+
+
 ## build.gradle (Project : 프로젝트명)
 
 > 프로젝트 수준의 gradle 설정 파일
