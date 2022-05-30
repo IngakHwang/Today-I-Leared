@@ -704,6 +704,40 @@ foreground 화면도 MainActivity가 차지
 
    액티비티에서 연결이 해제
 
+
+
+## ViewLifeCycleOwner
+
+Fragment를 사용하다보면 `onCreateView()` 함수 호출 될때, view 를 생성하고
+
+`onViewCreated()` 함수에서 이미 생성한 view를 사용한다.
+
+
+
+viewLifeCycleOwner 는 `onCreateView()` 에서 생성되는 view의 LifeCycle를 뜻한다.
+
+즉, `onCreateView() ~ onDestoryView()` 까지 라이프 사이클을 가진다.
+
+
+
+### Fragment LifeCycle, ViewLifeCycle 차이
+
+Fragment LifeCycle은 `onAttch ~ onDestory` 의 생명주기를 가진다.
+
+Fragment ViewLifeCycle은 `createView ~ destoryView` 를 가진다.
+
+
+
+Fragment LifeCycle은 Fragment가 생성되는 `create` 과정부터, 제거되는 `destory` 까지 진행된다.
+
+Fragment ViewLifeCycle은 View 가 생성되는 `onCreateView` 부터, 제거되는 `onDestoryView` 까지만 진행된다.
+
+<img src="https://blog.kakaocdn.net/dn/bC6F7D/btraPuZwjxw/tbNIOutykvGIPzulhBgnZK/img.png" alt="img" style="zoom:50%;" />
+
+<img src="https://blog.kakaocdn.net/dn/bV4uVF/btraWSYUACR/H2vG8Fs8YkItnLiGqOnKs1/img.png" alt="img" style="zoom:50%;" />
+
+
+
 ---
 
 참고 사이트
@@ -711,3 +745,5 @@ foreground 화면도 MainActivity가 차지
 김초희 깃헙 : https://choheeis.github.io/newblog//articles/2021-02/fragment
 
 김초희 깃헙2 : https://choheeis.github.io/newblog//articles/2021-02/fragment2
+
+티스토리 : https://gift123.tistory.com/57
