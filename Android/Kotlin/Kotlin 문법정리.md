@@ -991,7 +991,7 @@ class childCalss: BaseClass(){
 
 
 
-익스텐션
+**익스텐션**
 
 미리 만들어져 있는 클래스에 메서드를 넣는 개념
 
@@ -1014,6 +1014,57 @@ fun.sleep()
 ```
 
 
+
+#### 상속 변경자
+
+Java에서는 classs는 기본적으로 상속이 가능
+
+상속을 불가능하게 만들기 위해서는 `final` 변경자를 붙어야 한다.
+
+객체 지향 관점에서는 객체가 있고 해당 객체에 대한 코드를 줄이기 위해 재사용 가능하다면 재사용 하는 것이 좋지만, 이러한 사용 방식은 상속하는 기반 클래스가 변경이 없는 경우에만 유효
+
+기반 클래스 (부모)가 변경이 잦은데 무분별하게 클래스를 상속하게 된다면, 취약한 기바 클래스(fragile base class) 문제에 직면하게 된다.
+
+기반 클래스가 변경될 때마다 상속한 모든 자식 클래스들은 변경되어야 하며, 어느 문제가 생길지 모른다.
+
+
+
+이런 문제를 해결하기 위해 코틀린에서는 class 의 기본 상속 변경자를 `final` 로 설정
+
+만약 특정 클래스가 상속되어도 되는 경우에만 `open` 이라는 변경자를 이용하면 상속 가능
+
+
+
+**`final`** : 상속이 불가능한 변경자
+
+**`open`** : 상속이 가능한 변경자
+
+**`abstract`** : 상속을 해야만 인스턴스화 가능한 변경자
+
+
+
+```kotlin
+open class Tab()
+class GalaxyTab() : Tab()			// final 생략
+
+abstract class Pad(){
+  var szie = 10
+  fun getSizeString() : String = "{$size}cm"
+}
+
+class Ipad : Pad()
+val ipad = Ipad()
+
+println(Ipad.getSizeString())		// 10cm
+```
+
+
+
+----
+
+Kotlin 상속 변경자 : https://kotlinworld.com/68?category=925008
+
+----
 
 ### 패키지
 
