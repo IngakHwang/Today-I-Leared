@@ -1803,6 +1803,126 @@ MyFunction.invoke("hello")
 MyFunction("hello")
 ```
 
+`MyFunction` 은 Object 이다. 
+
+그렇게 때문에 `MyFunction` 을 `print` 해보면 `MyFunction` 의 주솟값만 출력될 뿐이다.
+
+그런데 `MyFunction` 안에 `invoke()` 함수가 정의 되어 있으므로 `MyFunction` 에서 메서드 이름 없이 바로 호출한 것이다.
+
+물론 파라미터를 받을 창구가 있어야 하므로 () 안에 파라미터를 넣어서 실행이 가능하다.
+
+
+
+**연산자**
+
+이렇게 분명히 `invoke` 와 같이 이름을 부여한 함수임에도 불구하고 실행을 간편하게 할 수 있게 하는 것들을 연산자 라고 한다.
+
+그런 연산자들 몇 개를 코틀린에서 미리 정해 놓았다.
+
+대표적으로 `+` 연산자
+
+```kotlin
+object Sample {
+  operator fun plus (str : String) : String {
+  	return this.toString() + str
+  }
+  
+  main () {
+    Sample + " Hello~!"					// [Sample 주소값] Hello~!
+  }
+}
+```
+
+실행 시 `[Sample 주소값]` 부분에는 실제로 주소값이 들어가고, 그 뒤에 바로 Hello~! 라는 글자가 붙는다.
+
+즉 `plus` 라는 이름으로 함수를 만들었지만 `plus` 는 코틀린에서 연산자로 정의해 놓았으므로 `plus` 연산자를 호출하기 위해 특별히 `+` 기호를 사용해서 호출한다.
+
+
+
+**람다는 invoke 함수를 가진 객체**
+
+코틀린은 람다를 지원한다.
+
+예를 들어 아래와 같은 람다 함수 있다고 하자. 이미 코틀린이 기본으로 제공하는 함수를 한 번 감싸는 의미 없는 코드이지만 이해를 위해 작성
+
+```kotlin
+val toUpperCase = {str : String -> str.toUpperCase()}
+```
+
+모든 값, 또는 값을 담는 변수에는 타입이 있다.
+
+Int, String, Double 또는 클래스 타입 일 수 있다.
+
+그렇다면 위의 `toUpperCase` 는 무슨 타입일까? Int, String도 아니다
+
+String 을 받고 다시 String을 반환하는 (String) -> String 타입이다.
+
+
+
+무슨 의미 일까?
+
+위 타입은 코틀린 표준 라이브러리에 정의된 `Function1<P1, R>` 인터페이스 타입이다.
+
+`Function<P1, R>` 의 구현을 살펴보면 `invoke(P1) : R` 연산자 하나만 달랑 존재한다.
+
+위에 언급했듯이 `invoke` 연산자는 이름 없이 호출할 수 잇다.
+
+이름 없는 함수인 람다와 연관성이 조금 있어보인다.
+
+
+
+결국 위에서 작성한 `toUpperCase` 는 아래 코드와 같다.
+
+```kotlin
+val toUpperCase = object : Function1<String, String>{
+  override fun invoke(p1 : String) : String {
+    return p1.toUpperCase()
+  }
+}
+```
+
+실제로 코틀린에서 작성한 람다는 위의 코드와 같기 때문에 결국 람다도 컴파일 시간에 람다가 할당된 객체로 변환된다는 뜻이다.
+
+개발자는 그것의 `invoke` 를 호출하는 셈이다.
+
+
+
+`toUpperCase`  는 현재 `invoke` 라는 연산자 하나를 가진 객체이다.
+
+이제 위에서 알아본대로 `toUpperCase.invoke("hello")` 가 아닌 `toUpperCase("hello")` 와 같이 호출할 수 있음을 기억한채 `toUpperCase` 를 사용한다면
+
+```kotlin
+fun main(){
+  val strList = listOf("a","b","c")
+  println(strList.map(toUpperCase))			//[A,B,C]
+}
+```
+
+`map` 함수는 `strList` 의 요소들을 순회하면서 각각의 요소(a,b,c) 마다 `toUpperCase(요소)` 를 실행할 것이다.
+
+`toUpperCase` 가 `invoke` 연산자를 가지고 있기 떄문에 이렇게 편하게 사용 가능한 것이다.
+
+위의 코드를 아래와 같이 작성할 수 있다. 
+
+```kotlin
+fun main(){
+  val strList = listOf("a","b","c")
+  println(strList.map {str : String -> str.toUpperCase()})		//[A,B,C]
+}
+```
+
+`{str: String -> str.toUpperCase()}` 이 부분이 결국 런타임 시 `invoke`를 하나 가지는 오브젝트로 변환된다.
+
+
+
+#### operator
+
+코틀린은 이름을 부여한 함수임에도 불구하고 실행을 간편하게 할 수 있는 연산자 라는 것을 제공한다.
+
+이러한 연산자의 예시로는 +, - 부터 invoke 까지 있는데, 이러한 연산자를 overloading 할 수 있도록 제공하는 키워드가 바로 `operartor` 이다.
+
+
+
 
 
 ----
@@ -1812,6 +1932,8 @@ MyFunction("hello")
 1. 코틀린 스타일 가이드 : https://developer.android.com/kotlin/style-guide
 
 2. 코틀린 키워드 연산자 : https://runebook.dev/ko/docs/kotlin/docs/reference/keyword-reference
+
+3. invoke : https://velog.io/@cgw0519/Kotlin-invoke-%ED%95%A8%EC%88%98%EB%8A%94-%EB%AC%B4%EC%97%87%EC%9D%BC%EA%B9%8C , https://wooooooak.github.io/kotlin/2019/03/21/kotlin_invoke/
 
    
 
