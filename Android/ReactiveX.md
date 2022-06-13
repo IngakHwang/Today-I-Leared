@@ -1005,3 +1005,22 @@ runBlocking { delay(200) }			// 0.2초 대기
 2nd : 5
 ```
 
+
+
+----
+
+# 용어 정리
+
+`observable` : 데이터 흐름에 맞게 알림을 보내 observer가 데이터를 사용할 수 있도록 해줌
+
+`observeOn` : observable이 다음 처리를 진행할 때 사용할 스레드 지정
+
+`subscribe` : observer 는 observable을 구독해 데이터 소비
+
+`subscribeOn` : 구독에서 사용할 스레드 지정
+
+`doOnsubscribe` : observable 이 구독 될 때 호출되는 콜백함수
+
+`doFinally` : observalbe이 종료될 때 실행
+
+`dispoasable` : observer가 더이상 필요 없거나 Data를 받아오지 않을 때를 위한 객체
